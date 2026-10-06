@@ -51,8 +51,6 @@ export const en: Dict = {
     coverAlt: 'Project cover rendered in blue and pink pixels',
   },
 
-  ticker: ['Fast websites', 'UX/UI', 'SEO', 'Design + code', 'Landing pages', 'Automations', 'Performance'],
-
   services: {
     title: 'What I do.',
     intro: 'From first sketch to live site, with the same care at every step.',

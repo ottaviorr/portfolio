@@ -1,5 +1,7 @@
 ---
 import ColorTitle from './ColorTitle.astro';
+import PixelCorner from './PixelCorner.astro';
+import cornerB from '../assets/corner-b.png';
 import { toolkit } from '../site';
 import { t, type Lang } from '../i18n';
 
@@ -12,7 +14,8 @@ const tools = [
 ];
 ---
 
-<section class="section">
+<section class="section has-corner">
+  <PixelCorner src={cornerB} corner="bottom-left" />
   <div class="head">
     <ColorTitle as="h2" class="h1" text={d.title} dot="blue" />
     <p class="intro">{d.intro}</p>

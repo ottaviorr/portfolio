@@ -51,8 +51,6 @@ export const pt = {
     coverAlt: 'Capa do projeto em pixels azuis e rosa',
   },
 
-  ticker: ['Sites rápidos', 'UX/UI', 'SEO', 'Design + código', 'Landing pages', 'Automações', 'Performance'],
-
   services: {
     title: 'O que eu faço.',
     intro: 'Do primeiro rascunho ao site no ar, com o mesmo cuidado em cada etapa.',

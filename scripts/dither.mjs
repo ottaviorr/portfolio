@@ -75,3 +75,41 @@ await sharp(dither(field, FW, FH, FIELD), { raw: { width: FW, height: FH, channe
   .png({ palette: true, colors: FIELD.length })
   .toFile('src/assets/path-dither.png');
 console.log('✓ path-dither.png');
+
+// Arte de canto (estilo Legency): blobs orgânicos em pixel "gordo", com fundo TRANSPARENTE
+// (funciona no tema claro e escuro). Gerada pequena (240px) e exibida a 4× com
+// image-rendering: pixelated — escala inteira, bloco de 4px, não cintila na rolagem.
+const BLOB = [
+  null, // transparente
+  [0x06, 0x71, 0xb7], // blue
+  [0x67, 0xa3, 0xd9], // blue-light
+  [0xf8, 0xb7, 0xcd], // pink
+  [0xf6, 0xd2, 0xe0], // pink-light
+];
+function blob(name, centers) {
+  const S = 240;
+  const field = Buffer.alloc(S * S);
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      // metaballs: soma de influências → borda orgânica que some no transparente
+      let v = 0;
+      for (const [cx, cy, r] of centers) v += (r * r) / ((x - cx) ** 2 + (y - cy) ** 2 + 1);
+      // ondulação leve pra textura não ficar lisa; faixa larga de valores = mais dither, menos chapado
+      v += 0.25 * Math.sin(x * 0.09) * Math.sin(y * 0.07 + x * 0.03);
+      field[y * S + x] = Math.round(Math.min(1, Math.max(0, (v - 0.3) / 3.2)) * 255);
+    }
+  }
+  const levels = BLOB.length - 1;
+  const out = Buffer.alloc(S * S * 4);
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      const v = (field[y * S + x] / 255) * levels;
+      const idx = Math.min(levels, Math.floor(v) + (v % 1 > (BAYER[y % 8][x % 8] + 0.5) / 64 ? 1 : 0));
+      if (BLOB[idx]) out.set([...BLOB[idx], 255], (y * S + x) * 4);
+    }
+  }
+  return sharp(out, { raw: { width: S, height: S, channels: 4 } }).png({ palette: true }).toFile(`src/assets/${name}.png`);
+}
+await blob('corner-a', [[150, 140, 52], [95, 175, 34], [185, 80, 30]]);
+await blob('corner-b', [[110, 110, 48], [160, 150, 30], [70, 70, 26]]);
+console.log('✓ corner-a.png, corner-b.png');

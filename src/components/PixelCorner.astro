@@ -1,0 +1,59 @@
+---
+// Arte de canto em pixel art (dither azul/rosa, estilo Legency), atrás do conteúdo.
+// A imagem tem 240px e é exibida a 4× (2× no celular): escala inteira + pixelated = bloco nítido
+// que não cintila na rolagem. A seção que usa precisa da classe "has-corner".
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  corner: 'bottom-left' | 'bottom-right';
+}
+const { src, corner } = Astro.props;
+---
+
+<img class:list={['px-corner', corner]} src={src.src} width={src.width} height={src.height} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+
+<style is:global>
+  .has-corner {
+    position: relative;
+    isolation: isolate; /* arte com z-index -1 fica atrás do texto, mas dentro da seção */
+    overflow: clip; /* corta nos limites da seção: não alarga nem alonga a página */
+  }
+  .px-corner {
+    position: absolute;
+    z-index: -1;
+    width: 960px;
+    height: 960px;
+    max-width: none;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+  /* Ferramentas: o blob "nasce" do rodapé da seção, no vazio abaixo dos blocos */
+  .px-corner.bottom-left {
+    bottom: -640px;
+    left: -280px;
+    /* só o terço de cima aparece na seção: some antes da borda em vez de cortar reto */
+    mask-image: linear-gradient(to bottom, #000 16%, transparent 33%);
+  }
+  /* Contato: canto inferior direito, apagando na direção do texto */
+  .px-corner.bottom-right {
+    bottom: -400px;
+    right: -260px;
+    mask-image: radial-gradient(circle at 70% 65%, #000 30%, transparent 62%);
+  }
+  @media (max-width: 760px) {
+    .px-corner {
+      width: 480px;
+      height: 480px;
+      opacity: 0.7;
+    }
+    .px-corner.bottom-left {
+      bottom: -320px;
+      left: -160px;
+    }
+    .px-corner.bottom-right {
+      bottom: -200px;
+      right: -170px;
+    }
+  }
+</style>

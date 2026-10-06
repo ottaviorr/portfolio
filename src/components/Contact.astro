@@ -1,5 +1,7 @@
 ---
 import ColorTitle from './ColorTitle.astro';
+import PixelCorner from './PixelCorner.astro';
+import cornerA from '../assets/corner-a.png';
 import { site } from '../site';
 import { t, type Lang } from '../i18n';
 
@@ -12,7 +14,8 @@ const links = [
 ];
 ---
 
-<section id="contato" class="contact">
+<section id="contato" class="contact has-corner">
+  <PixelCorner src={cornerA} corner="bottom-right" />
   <div class="section contact-body">
     <ColorTitle as="h2" class="h1" text={d.title} />
     <div class="contact-grid">
