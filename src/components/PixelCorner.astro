@@ -28,18 +28,25 @@ const { src, corner } = Astro.props;
     image-rendering: pixelated;
     pointer-events: none;
   }
-  /* Ferramentas: o blob "nasce" do rodapé da seção, no vazio abaixo dos blocos */
-  .px-corner.bottom-left {
-    bottom: -640px;
-    left: -280px;
-    /* só o terço de cima aparece na seção: some antes da borda em vez de cortar reto */
-    mask-image: linear-gradient(to bottom, #000 16%, transparent 33%);
-  }
-  /* Contato: canto inferior direito, apagando na direção do texto */
+  /* As duas sobem de um canto inferior e somem antes da borda da seção (sem corte reto).
+     Só o trecho de cima da imagem aparece: o resto fica abaixo da seção, cortado. */
+  .px-corner.bottom-left,
   .px-corner.bottom-right {
-    bottom: -400px;
-    right: -260px;
-    mask-image: radial-gradient(circle at 70% 65%, #000 30%, transparent 62%);
+    bottom: -540px;
+    mask-image: linear-gradient(to bottom, #000 26%, transparent 44%);
+  }
+  .px-corner.bottom-left {
+    left: -280px;
+  }
+  /* Contato: o miolo rosa fica no canto inferior direito; some pra baixo (antes da faixa
+     "Bora conversar") e em círculo na direção do e-mail */
+  .px-corner.bottom-right {
+    right: -300px;
+    bottom: -350px;
+    mask-image:
+      linear-gradient(to bottom, #000 56%, transparent 66%),
+      radial-gradient(circle at 62% 58%, #000 22%, transparent 38%);
+    mask-composite: intersect;
   }
   @media (max-width: 760px) {
     .px-corner {
@@ -47,13 +54,16 @@ const { src, corner } = Astro.props;
       height: 480px;
       opacity: 0.7;
     }
+    .px-corner.bottom-left,
+    .px-corner.bottom-right {
+      bottom: -270px;
+    }
     .px-corner.bottom-left {
-      bottom: -320px;
       left: -160px;
     }
     .px-corner.bottom-right {
-      bottom: -200px;
-      right: -170px;
+      right: -175px;
+      bottom: -195px;
     }
   }
 </style>
