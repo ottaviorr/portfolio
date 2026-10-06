@@ -4,7 +4,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://ottaviorr-portifolio.vercel.app',
+  site: 'https://ottaviorr.vercel.app',
 
   i18n: {
     defaultLocale: 'pt',
