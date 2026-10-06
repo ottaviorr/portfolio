@@ -27,3 +27,6 @@ pnpm-debug.log*
 .vercel/
 
 .vercel
+
+# músicas baixadas: só locais (direitos autorais), o site usa prévias oficiais
+audios/

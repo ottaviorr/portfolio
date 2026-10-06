@@ -101,9 +101,17 @@ const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
               <div class="off-panel" role="tabpanel" id={`off-panel-${i}`} aria-labelledby={`off-tab-${i}`} style={`--accent: ${accents[i]}`}>
                 {
                   // o controle (item de games) é o easter egg: clicar abre o DOOM
-                  i === 1 ? (
-                    <button type="button" class="egg" data-doom-open data-cursor="button" aria-label={d.doom.play}>
-                      <span class="egg-bubble" aria-hidden="true">PRESS START</span>
+                  // controle abre o DOOM; notas musicais abrem o MP3
+                  i === 1 || i === 2 ? (
+                    <button
+                      type="button"
+                      class="egg"
+                      data-doom-open={i === 1 ? '' : undefined}
+                      data-music-open={i === 2 ? '' : undefined}
+                      data-cursor="button"
+                      aria-label={i === 1 ? d.doom.play : d.music.open}
+                    >
+                      <span class="egg-bubble" aria-hidden="true">{i === 1 ? 'PRESS START' : 'PRESS PLAY'}</span>
                       <svg class="sprite" viewBox="0 0 14 9" shape-rendering="crispEdges" aria-hidden="true">
                         {pixels[i].map((p) => (
                           <rect x={p.x} y={p.y} width="1" height="1" class:list={[p.alt && 'alt']} style={`--d:${p.x + p.y}`} />

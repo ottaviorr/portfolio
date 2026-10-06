@@ -8,6 +8,7 @@ import About from './About.astro';
 import Toolkit from './Toolkit.astro';
 import Contact from './Contact.astro';
 import DoomModal from './DoomModal.astro';
+import MusicModal from './MusicModal.astro';
 import type { Lang } from '../i18n';
 
 const { lang } = Astro.props as { lang: Lang };
@@ -22,4 +23,5 @@ const { lang } = Astro.props as { lang: Lang };
   <Toolkit lang={lang} />
   <Contact lang={lang} />
   <DoomModal lang={lang} />
+  <MusicModal lang={lang} />
 </Base>

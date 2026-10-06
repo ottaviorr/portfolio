@@ -1,0 +1,650 @@
+---
+// Easter egg: MP3 player em pixel (notas musicais em "Um pouco de mim").
+// Só as capas (pixeladas, 44KB) ficam no site. O áudio é a prévia oficial de 30s da Deezer,
+// buscada na hora de tocar (o link expira) — nada de música hospedada aqui.
+// Playlist: src/music.json, gerada por `npm run music`.
+// Classes com prefixo "m-": o DoomModal tem estilos globais (.screen etc.) que vazariam pra cá.
+import tracks from '../music.json';
+import { t, type Lang } from '../i18n';
+
+const { lang } = Astro.props as { lang: Lang };
+const d = t(lang).about.music;
+---
+
+<dialog class="mp3" aria-label={d.title}>
+  <button type="button" class="mp3-close" data-mp3-close aria-label={d.close}>✕</button>
+
+  <div class="m-player">
+    <div class="m-screen">
+      <div class="m-top" aria-hidden="true">
+        <span class="m-brand">ottaviorr<b>.</b></span>
+        <span class="m-vol"><i></i><i></i><i></i></span>
+        <span class="m-clock">--:--</span>
+        <span class="m-batt"></span>
+      </div>
+
+      <!-- tela "tocando agora" -->
+      <div class="m-now">
+        <div class="m-cover"><img src={`/music/${tracks[0].id}.png`} width="40" height="40" alt="" /></div>
+        <p class="m-title"><span>{tracks[0].title}</span></p>
+        <p class="m-artist">{tracks[0].artist}</p>
+        <div class="m-bar" aria-hidden="true"><i></i></div>
+        <p class="m-times" aria-hidden="true"><span class="m-cur">0:00</span><span class="m-pos">1 / {tracks.length}</span><span>0:30</span></p>
+      </div>
+
+      <!-- tela "lista" (MENU) -->
+      <ul class="m-list" role="listbox" aria-label={d.title} hidden>
+        {
+          tracks.map((tr, i) => (
+            <li role="option" aria-selected={i === 0 ? 'true' : 'false'} data-i={i}>
+              <img src={`/music/${tr.id}.png`} width="40" height="40" alt="" />
+              <span>
+                <b>{tr.title}</b>
+                {tr.artist}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- click wheel -->
+    <div class="m-wheel">
+      <button type="button" class="w-menu" data-act="menu">MENU<span class="sr-only"> · {d.menu}</span></button>
+      <button type="button" class="w-prev" data-act="prev" aria-label={d.prev}>⏮</button>
+      <button type="button" class="w-next" data-act="next" aria-label={d.next}>⏭</button>
+      <button type="button" class="w-vol" data-act="vol">VOL<span class="sr-only"> · {d.volume}</span></button>
+      <button type="button" class="w-play" data-act="play" aria-label={d.play} data-play={d.play} data-pause={d.pause}><span class="ico"></span></button>
+    </div>
+  </div>
+
+  <a class="mp3-link" href={tracks[0].link} target="_blank" rel="noopener">{d.preview} ↗</a>
+  <p class="mp3-err" hidden>{d.error}</p>
+</dialog>
+
+<script type="application/json" id="mp3-data" set:html={JSON.stringify(tracks)} />
+
+<style is:global>
+  .mp3 {
+    margin: auto;
+    padding: 24px 20px 16px;
+    border: 0;
+    background: none;
+    overflow: visible;
+    color: var(--ink);
+  }
+  .mp3::backdrop {
+    background:
+      radial-gradient(circle, rgb(248 183 205 / 0.18) 1px, transparent 1.5px) 0 0 / 10px 10px,
+      rgb(7 11 20 / 0.9);
+  }
+  .mp3[open] .m-player {
+    animation: mp3-in 420ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+  @keyframes mp3-in {
+    from {
+      translate: 0 40px;
+      scale: 0.9;
+      opacity: 0;
+    }
+  }
+  .mp3-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 800;
+    box-shadow:
+      inset -3px -3px 0 0 rgb(0 0 0 / 0.25),
+      0 0 0 3px var(--pink);
+  }
+  .mp3-close:hover {
+    background: var(--pink);
+  }
+
+  /* corpo do aparelho: claro, sombra dura rosa (mesma linguagem do DOOM) */
+  .m-player {
+    width: 288px;
+    padding: 18px 18px 26px;
+    background: color-mix(in srgb, var(--ice) 55%, var(--paper));
+    border-radius: 18px;
+    box-shadow:
+      inset -4px -4px 0 0 rgb(0 0 0 / 0.1),
+      inset 4px 4px 0 0 rgb(255 255 255 / 0.7),
+      10px 10px 0 0 var(--pink);
+  }
+
+  /* tela */
+  .m-screen {
+    position: relative;
+    height: 312px;
+    padding: 8px 10px 10px;
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 6px;
+    box-shadow: 0 0 0 4px #3d4256;
+  }
+  .m-screen::after {
+    /* linhas de LCD */
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.2) 0 1px, transparent 1px 3px);
+  }
+  .m-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-display);
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+  .m-brand {
+    flex: 1;
+  }
+  .m-brand b {
+    color: var(--pink);
+  }
+  .m-vol {
+    display: flex;
+    align-items: end;
+    gap: 2px;
+    height: 10px;
+  }
+  .m-vol i {
+    width: 3px;
+    background: var(--blue-light);
+  }
+  .m-vol i:nth-child(1) { height: 4px; }
+  .m-vol i:nth-child(2) { height: 7px; }
+  .m-vol i:nth-child(3) { height: 10px; }
+  .m-vol[data-level='1'] i:nth-child(n + 2),
+  .m-vol[data-level='2'] i:nth-child(3) {
+    opacity: 0.25;
+  }
+  /* bateria em pixel */
+  .m-batt {
+    position: relative;
+    width: 18px;
+    height: 9px;
+    border: 2px solid var(--paper);
+  }
+  .m-batt::before {
+    content: '';
+    position: absolute;
+    inset: 1px 3px 1px 1px;
+    background: var(--pink);
+  }
+  .m-batt::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    right: -4px;
+    width: 2px;
+    height: 3px;
+    background: var(--paper);
+  }
+
+  .m-now[hidden],
+  .m-list[hidden] {
+    display: none;
+  }
+  .m-now {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    margin-top: 12px;
+    text-align: center;
+  }
+  .m-cover {
+    width: 160px;
+    height: 160px;
+    padding: 3px;
+    background: var(--blue-light);
+    box-shadow: 4px 4px 0 0 var(--pink);
+  }
+  .m-cover img {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+  /* capa "pulsa" de leve enquanto toca */
+  .mp3.is-playing .m-cover {
+    animation: mp3-beat 0.9s steps(2) infinite;
+  }
+  @keyframes mp3-beat {
+    50% {
+      translate: 0 -2px;
+    }
+  }
+  .m-title {
+    width: 100%;
+    margin-top: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+  }
+  .m-title span {
+    display: inline-block;
+  }
+  /* título longo rola dentro da tela, como no aparelho de verdade */
+  .m-title.is-long span {
+    padding-left: 100%;
+    animation: mp3-marquee 9s linear infinite;
+  }
+  @keyframes mp3-marquee {
+    to {
+      translate: -100% 0;
+    }
+  }
+  .m-artist {
+    font-size: 0.75rem;
+    color: var(--blue-light);
+  }
+  /* barra de progresso em blocos */
+  .m-bar {
+    width: 100%;
+    height: 10px;
+    margin-top: 10px;
+    padding: 2px;
+    border: 2px solid color-mix(in srgb, var(--paper) 50%, transparent);
+  }
+  .m-bar i {
+    display: block;
+    width: var(--p, 0%);
+    height: 100%;
+    background: repeating-linear-gradient(to right, var(--pink) 0 6px, transparent 6px 8px);
+  }
+  .m-times {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-family: var(--font-display);
+    font-size: 0.625rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: color-mix(in srgb, var(--paper) 60%, transparent);
+  }
+
+  /* lista */
+  .m-list {
+    list-style: none;
+    margin-top: 8px;
+    padding: 0;
+    height: calc(100% - 20px);
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .m-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px;
+    font-size: 0.6875rem;
+    line-height: 1.25;
+    color: color-mix(in srgb, var(--paper) 70%, transparent);
+    cursor: pointer;
+  }
+  .m-list li img {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    image-rendering: pixelated;
+  }
+  .m-list li b {
+    display: block;
+    color: var(--paper);
+    font-family: var(--font-display);
+  }
+  .m-list li[aria-selected='true'] {
+    background: var(--pink);
+    color: var(--ink);
+  }
+  .m-list li[aria-selected='true'] b {
+    color: var(--ink);
+  }
+
+  /* click wheel */
+  .m-wheel {
+    position: relative;
+    width: 196px;
+    height: 196px;
+    margin: 26px auto 0;
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow:
+      inset 0 -4px 0 0 rgb(0 0 0 / 0.08),
+      0 3px 0 0 rgb(0 0 0 / 0.15);
+  }
+  .m-wheel button {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.8125rem;
+    letter-spacing: 0.06em;
+  }
+  .m-wheel button:not(.w-play):hover,
+  .m-wheel button:not(.w-play):focus-visible {
+    color: var(--blue);
+  }
+  .w-menu,
+  .w-vol {
+    left: 50%;
+    translate: -50% 0;
+    width: 80px;
+    height: 48px;
+  }
+  .w-menu {
+    top: 6px;
+  }
+  .w-vol {
+    bottom: 6px;
+  }
+  .w-prev,
+  .w-next {
+    top: 50%;
+    translate: 0 -50%;
+    width: 48px;
+    height: 80px;
+    font-size: 1rem !important;
+  }
+  .w-prev {
+    left: 6px;
+  }
+  .w-next {
+    right: 6px;
+  }
+  .w-play {
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--ice) 55%, var(--paper)) !important;
+    box-shadow:
+      inset 0 3px 0 0 rgb(0 0 0 / 0.1),
+      0 0 0 2px rgb(0 0 0 / 0.06);
+  }
+  .w-play:active {
+    box-shadow: inset 0 5px 0 0 rgb(0 0 0 / 0.15);
+  }
+  /* ícone play/pause */
+  .w-play .ico {
+    width: 16px;
+    height: 18px;
+    background: var(--pink);
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+  }
+  .mp3.is-playing .w-play .ico {
+    width: 14px;
+    background: linear-gradient(to right, var(--pink) 0 38%, transparent 38% 62%, var(--pink) 62%);
+    clip-path: none;
+  }
+  .w-play.is-loading .ico {
+    animation: mp3-blink 0.6s steps(1) infinite;
+  }
+  @keyframes mp3-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .mp3-link {
+    display: block;
+    margin-top: 18px;
+    text-align: center;
+    font-size: var(--fs-meta);
+    color: var(--blue-light);
+  }
+  .mp3-link:hover {
+    color: var(--pink);
+  }
+  .mp3-err {
+    margin-top: 6px;
+    text-align: center;
+    font-size: var(--fs-meta);
+    color: var(--pink);
+  }
+  .mp3-err[hidden] {
+    display: none;
+  }
+
+  /* cursor custom fica atrás do top layer: aqui dentro volta o do sistema */
+  html.has-cursor .mp3,
+  html.has-cursor .mp3 * {
+    cursor: auto !important;
+  }
+  html.has-cursor .mp3 button,
+  html.has-cursor .mp3 a,
+  html.has-cursor .mp3 li,
+  html.has-cursor .mp3 button * {
+    cursor: pointer !important;
+  }
+  html:has(dialog.mp3[open]) .cursor {
+    display: none;
+  }
+
+  /* telas baixas: aparelho menor */
+  @media (max-height: 760px) {
+    .mp3 .m-player {
+      zoom: 0.85;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mp3[open] .m-player,
+    .mp3.is-playing .m-cover,
+    .m-title.is-long span {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  type Track = { id: number; title: string; artist: string; album: string; link: string };
+  const tracks: Track[] = JSON.parse(document.getElementById('mp3-data')!.textContent!);
+  const dialog = document.querySelector<HTMLDialogElement>('dialog.mp3')!;
+  const $ = <T extends Element>(s: string) => dialog.querySelector<T>(s)!;
+  const audio = new Audio();
+  audio.preload = 'none';
+
+  const nowEl = $<HTMLElement>('.m-now');
+  const listEl = $<HTMLUListElement>('.m-list');
+  const rows = [...listEl.querySelectorAll<HTMLLIElement>('li')];
+  const img = $<HTMLImageElement>('.m-cover img');
+  const titleEl = $<HTMLElement>('.m-title');
+  const titleSpan = titleEl.querySelector('span')!;
+  const artistEl = $<HTMLElement>('.m-artist');
+  const bar = $<HTMLElement>('.m-bar i');
+  const cur = $<HTMLElement>('.m-cur');
+  const pos = $<HTMLElement>('.m-pos');
+  const link = $<HTMLAnchorElement>('.mp3-link');
+  const err = $<HTMLElement>('.mp3-err');
+  const playBtn = $<HTMLButtonElement>('.w-play');
+  const vol = $<HTMLElement>('.m-vol');
+  const clock = $<HTMLElement>('.m-clock');
+
+  let index = 0;
+  let cursor = 0; // item marcado na lista
+  let level = 3;
+
+  // a prévia da Deezer vem com link que expira: busca na hora (JSONP, a API não libera CORS)
+  const cache = new Map<number, string>();
+  let n = 0;
+  function preview(id: number) {
+    if (cache.has(id)) return Promise.resolve(cache.get(id)!);
+    return new Promise<string>((ok, fail) => {
+      const cb = `__mp3_${n++}`;
+      const s = document.createElement('script');
+      const w = window as unknown as Record<string, unknown>;
+      const done = () => {
+        delete w[cb];
+        s.remove();
+      };
+      w[cb] = (data: { preview?: string }) => {
+        done();
+        if (data?.preview) {
+          cache.set(id, data.preview);
+          ok(data.preview);
+        } else fail(new Error('sem prévia'));
+      };
+      s.src = `https://api.deezer.com/track/${id}?output=jsonp&callback=${cb}`;
+      s.onerror = () => {
+        done();
+        fail(new Error('rede'));
+      };
+      document.head.append(s);
+    });
+  }
+
+  const fmt = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
+
+  function show(i: number) {
+    index = (i + tracks.length) % tracks.length;
+    const tr = tracks[index];
+    img.src = `/music/${tr.id}.png`;
+    titleSpan.textContent = tr.title;
+    artistEl.textContent = tr.artist;
+    link.href = tr.link;
+    pos.textContent = `${index + 1} / ${tracks.length}`;
+    bar.style.setProperty('--p', '0%');
+    cur.textContent = '0:00';
+    titleEl.classList.remove('is-long');
+    requestAnimationFrame(() => titleEl.classList.toggle('is-long', titleSpan.offsetWidth > titleEl.clientWidth));
+    rows.forEach((r, j) => r.setAttribute('aria-selected', String(j === index)));
+    cursor = index;
+  }
+
+  let loadedId = 0;
+  async function play(i = index) {
+    show(i);
+    err.hidden = true;
+    const id = tracks[index].id;
+    if (loadedId !== id) {
+      audio.pause();
+      playBtn.classList.add('is-loading');
+      try {
+        audio.src = await preview(id);
+        loadedId = id;
+      } catch {
+        playBtn.classList.remove('is-loading');
+        err.hidden = false;
+        return;
+      }
+      if (tracks[index].id !== id) return; // trocou de faixa enquanto carregava
+    }
+    try {
+      await audio.play();
+    } catch {
+      err.hidden = false;
+    }
+    playBtn.classList.remove('is-loading');
+  }
+  const toggle = () => (audio.paused ? play() : audio.pause());
+
+  audio.addEventListener('play', () => {
+    dialog.classList.add('is-playing');
+    playBtn.setAttribute('aria-label', playBtn.dataset.pause!);
+  });
+  audio.addEventListener('pause', () => {
+    dialog.classList.remove('is-playing');
+    playBtn.setAttribute('aria-label', playBtn.dataset.play!);
+  });
+  audio.addEventListener('timeupdate', () => {
+    const total = audio.duration || 30;
+    bar.style.setProperty('--p', `${(audio.currentTime / total) * 100}%`);
+    cur.textContent = fmt(audio.currentTime);
+  });
+  audio.addEventListener('ended', () => play(index + 1)); // acabou a prévia: próxima
+
+  function toggleList(force?: boolean) {
+    const open = force ?? listEl.hidden;
+    listEl.hidden = !open;
+    nowEl.hidden = open;
+    if (open) rows[cursor].scrollIntoView({ block: 'nearest' });
+  }
+  function moveCursor(k: number) {
+    cursor = (cursor + k + tracks.length) % tracks.length;
+    rows.forEach((r, j) => r.setAttribute('aria-selected', String(j === cursor)));
+    rows[cursor].scrollIntoView({ block: 'nearest' });
+  }
+
+  const actions: Record<string, () => void> = {
+    menu: () => toggleList(),
+    play: () => {
+      if (!listEl.hidden) {
+        toggleList(false);
+        play(cursor);
+      } else toggle();
+    },
+    prev: () => (listEl.hidden ? play(index - 1) : moveCursor(-1)),
+    next: () => (listEl.hidden ? play(index + 1) : moveCursor(1)),
+    vol: () => {
+      level = (level % 3) + 1;
+      audio.volume = [0.25, 0.6, 1][level - 1];
+      vol.dataset.level = String(level);
+    },
+  };
+
+  dialog.querySelectorAll<HTMLButtonElement>('.m-wheel [data-act]').forEach((b) =>
+    b.addEventListener('click', () => actions[b.dataset.act!]()),
+  );
+  rows.forEach((r) =>
+    r.addEventListener('click', () => {
+      toggleList(false);
+      play(Number(r.dataset.i));
+    }),
+  );
+
+  // teclado: espaço toca/pausa, setas trocam, M abre a lista
+  dialog.addEventListener('keydown', (e) => {
+    const map: Record<string, string> = { ' ': 'play', ArrowLeft: 'prev', ArrowRight: 'next', ArrowUp: 'prev', ArrowDown: 'next', m: 'menu', M: 'menu' };
+    const k = map[e.key];
+    if (!k || (e.target as Element).closest('a')) return;
+    e.preventDefault();
+    actions[k]();
+  });
+
+  // relógio de verdade na tela
+  const tick = () => (clock.textContent = new Date().toTimeString().slice(0, 5));
+  let clockTimer = 0;
+
+  function open() {
+    if (dialog.open) return;
+    dialog.showModal();
+    tick();
+    clockTimer = window.setInterval(tick, 10_000);
+    show(index);
+  }
+  function close() {
+    toggleList(false);
+    dialog.close();
+  }
+  document.querySelectorAll('[data-music-open]').forEach((b) => b.addEventListener('click', open));
+  $('[data-mp3-close]').addEventListener('click', close);
+  dialog.addEventListener('close', () => {
+    audio.pause();
+    clearInterval(clockTimer);
+  });
+  // clicar fora do aparelho fecha
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) close();
+  });
+</script>
