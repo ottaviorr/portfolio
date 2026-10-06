@@ -60,8 +60,14 @@ const lastLine = lines.length - 1;
   .ct-dot--blue {
     color: var(--blue-light);
   }
-  /* modo play: inline-block pra poder mover a letra; sobe rápido com mola e volta devagar */
+  /* modo play: inline-block pra poder mover a letra; sobe rápido com mola e volta devagar.
+     .ct--kerned só entra depois que o script compensou o kerning perdido (ver fitKerning) */
   .ct--play .ct-char {
+    transition:
+      color var(--dur-out) var(--ease-trail),
+      transform 1100ms var(--ease-trail);
+  }
+  .ct--kerned .ct-char {
     display: inline-block;
     transition:
       color var(--dur-out) var(--ease-trail),
@@ -103,6 +109,30 @@ const lastLine = lines.length - 1;
     ch.classList.add('is-lit');
     clearTimeout(timers.get(ch));
     timers.set(ch, window.setTimeout(() => ch.classList.remove('is-lit'), 160));
+  }
+
+  // inline-block perde o kerning entre pares (ex.: "tá" encosta). Medimos onde cada letra
+  // fica no texto normal (inline) e compensamos a diferença com margin depois do inline-block.
+  function fitKerning(title: Element) {
+    const chars = [...title.querySelectorAll<HTMLElement>('.ct-char')];
+    title.classList.remove('ct--kerned');
+    chars.forEach((c) => (c.style.marginLeft = ''));
+    const target = chars.map((c) => c.getBoundingClientRect().left);
+    title.classList.add('ct--kerned');
+    chars.forEach((c, i) => {
+      const diff = target[i] - c.getBoundingClientRect().left; // já inclui o ajuste das letras anteriores
+      if (Math.abs(diff) > 0.1) c.style.marginLeft = `${diff}px`;
+    });
+  }
+  const playTitles = document.querySelectorAll('.ct--play');
+  if (playTitles.length && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    const fitAll = () => playTitles.forEach(fitKerning);
+    document.fonts.ready.then(fitAll);
+    let raf = 0;
+    addEventListener('resize', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(fitAll);
+    });
   }
 
   for (const title of document.querySelectorAll('[data-ct]')) {

@@ -66,7 +66,7 @@ export const en: Dict = {
   about: {
     title: 'About.',
     statement: 'Every business deserves a website that lives up to its work.',
-    text: `I'm Otávio, from Minas Gerais, Brazil. Before I design anything, I do the research: who the customers are, what competitors do, what makes someone trust a brand. Then I sweat the details so <mark>the site makes the business look its best</mark>, <mark class="pink">loads fast and is easy to find</mark>.`,
+    text: `I'm Otávio, from Minas Gerais, Brazil. <mark>I bring visual design and high performance together</mark> to build websites that are fast and engaging. Away from code, my energy goes into geek culture, lost in video game stories, or <mark class="pink">traveling to sing at the rail of a show</mark>.`,
     photoAlt: 'Otávio in a pink cap and shirt, throwing up the rock horns',
     badge: 'Computer Science · 8th semester · ',
     caption: 'ottaviorr, at some show',

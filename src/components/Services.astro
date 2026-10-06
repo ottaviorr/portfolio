@@ -71,8 +71,8 @@ const d = t(lang).services;
     border-radius: inherit;
     background: radial-gradient(
       circle at calc((var(--px) + 0.5) * 100%) calc((var(--py) + 0.5) * 100%),
-      color-mix(in srgb, var(--white) 9%, transparent),
-      transparent 55%
+      color-mix(in srgb, var(--white) 6%, transparent),
+      transparent 60%
     );
     opacity: 0;
     transition: opacity 400ms;
@@ -88,9 +88,6 @@ const d = t(lang).services;
     line-height: 1;
     letter-spacing: -0.05em;
     color: var(--accent);
-    /* parallax: o número corre um pouco mais que o card, como se estivesse na frente */
-    translate: calc(var(--px, 0) * 22px) calc(var(--py, 0) * 22px);
-    transition: translate 300ms var(--ease-out);
   }
   .card .h3 {
     margin-top: var(--space-4);

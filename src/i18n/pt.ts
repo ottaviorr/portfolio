@@ -66,7 +66,7 @@ export const pt = {
   about: {
     title: 'Sobre.',
     statement: 'Todo negócio merece um site à altura do que entrega.',
-    text: 'Sou o Otávio, de Minas Gerais. Antes de desenhar, eu pesquiso: quem é o cliente, o que a concorrência faz, o que faz alguém confiar numa marca. Depois, cuido de cada detalhe para que <mark>o site valorize a empresa</mark>, <mark class="pink">abra rápido e seja fácil de achar</mark>.',
+    text: 'Sou o Otávio, de Minas Gerais. <mark>Uno design visual à alta performance</mark> para criar sites rápidos e envolventes. Fora do código, minha energia vai para a cultura geek, imerso nas histórias de jogos, ou <mark class="pink">viajando para cantar na grade dos shows</mark>.',
     photoAlt: 'Otávio de boné e camisa rosa, fazendo o sinal do rock com a mão',
     badge: 'Ciência da Computação · 8º período · ',
     caption: 'ottaviorr, em algum show',

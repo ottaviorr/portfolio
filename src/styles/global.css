@@ -164,10 +164,10 @@ html.has-cursor * {
     [data-rise] {
       animation: rise linear both;
       animation-timeline: view();
-      animation-range: entry 0% entry 70%;
+      animation-range: entry 0% entry 100%;
     }
     [data-rise]:nth-child(even) {
-      animation-range: entry 15% entry 85%; /* coluna da direita chega um pouco depois */
+      animation-range: entry 20% cover 30%; /* coluna da direita chega um pouco depois */
     }
   }
 }
@@ -181,9 +181,14 @@ html.has-cursor * {
 [data-tilt] {
   --px: 0;
   --py: 0;
-  transform: perspective(900px) rotateX(calc(var(--py) * -10deg)) rotateY(calc(var(--px) * 12deg));
-  transition: transform 700ms var(--ease-out);
+  transform: perspective(1400px) rotateX(calc(var(--py) * -5deg)) rotateY(calc(var(--px) * 7deg));
+  transition:
+    transform 800ms var(--ease-out),
+    box-shadow 800ms var(--ease-out);
 }
 [data-tilt]:hover {
-  transition-duration: 150ms; /* segue o mouse de perto; ao sair, volta devagar */
+  /* levanta um pouco e a sombra cai pro lado oposto ao cursor: é isso que vende a profundidade */
+  transform: perspective(1400px) rotateX(calc(var(--py) * -5deg)) rotateY(calc(var(--px) * 7deg)) scale(1.015);
+  box-shadow: calc(var(--px) * -28px) calc(var(--py) * -28px + 28px) 56px -18px rgb(0 0 0 / 0.55);
+  transition-duration: 200ms; /* segue o mouse de perto; ao sair, volta devagar */
 }

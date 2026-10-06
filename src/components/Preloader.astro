@@ -1,5 +1,5 @@
 ---
-// Abertura curta (~1,4s): as letras do nome entram piscando azul/rosa e assentam em branco.
+// Abertura (~3s): as letras do nome entram piscando azul/rosa e assentam em branco.
 // Só na 1ª visita da sessão e nunca com reduced-motion. Sem JS, não aparece.
 const letters = [...'Otávio Herdy'];
 ---
@@ -31,7 +31,7 @@ const letters = [...'Otávio Herdy'];
     place-items: center;
     background: var(--bg);
     pointer-events: none;
-    animation: pre-out 500ms var(--ease-out) 1000ms forwards;
+    animation: pre-out 800ms cubic-bezier(0.76, 0, 0.24, 1) 2300ms forwards;
   }
   .preloader p {
     font-family: var(--font-display);
@@ -39,22 +39,25 @@ const letters = [...'Otávio Herdy'];
     font-size: clamp(2.5rem, 9vw, 7rem);
     letter-spacing: -0.05em;
   }
+  /* inline + top relativo (não inline-block) pra manter o kerning entre as letras */
   .preloader span {
-    display: inline-block;
+    position: relative;
     animation:
-      pre-in 500ms var(--ease-out) calc(var(--i) * 35ms) both,
-      pre-blink 700ms steps(1) calc(var(--i) * 35ms) both;
+      pre-in 800ms var(--ease-out) calc(var(--i) * 70ms) both,
+      pre-blink 1300ms steps(1) calc(var(--i) * 70ms) both;
   }
   @keyframes pre-in {
     from {
       opacity: 0;
-      translate: 0 40%;
+      top: 0.4em;
     }
   }
   @keyframes pre-blink {
     0% { color: var(--blue-light); }
-    35% { color: var(--pink); }
-    70%, 100% { color: var(--white); }
+    20% { color: var(--pink); }
+    40% { color: var(--blue-light); }
+    60% { color: var(--pink); }
+    80%, 100% { color: var(--white); }
   }
   @keyframes pre-out {
     to {
