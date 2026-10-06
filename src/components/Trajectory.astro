@@ -102,6 +102,9 @@ const d = t(lang).path;
     padding: 0 var(--gutter);
     visibility: hidden; /* GSAP mostra um por vez */
   }
+  .is-staged .traj-step:first-child {
+    visibility: visible; /* o 1º já está no palco; a entrada dele anima só as letras */
+  }
   .is-staged .traj-what {
     margin-inline: auto;
   }
@@ -172,21 +175,22 @@ const d = t(lang).path;
           // o fundo vira claro de baixo pra cima antes do "Hoje"
           tl.to('.traj-flip', { clipPath: 'inset(0% 0 0 0)', duration: 0.6, ease: 'power2.inOut' });
         }
+        // Regra anti-sobreposição: entrada anima as LETRAS e a nota; saída anima o BLOCO (step).
+        // Assim a timeline de entrada do 1º passo (intro) e a principal (tl) nunca disputam a
+        // mesma propriedade — antes, rolando rápido, a intro atrasada reacendia o passo 1.
         const enter = i === 0 ? intro : tl;
-        enter.set(step, { visibility: 'visible' });
+        if (i > 0) tl.set(step, { autoAlpha: 1 });
         enter.from(chars, { yPercent: 110, rotate: 10, opacity: 0, stagger: 0.025, duration: 0.6 });
         enter.from(note, { opacity: 0, y: 16, duration: 0.3 }, '>-0.1'); // só depois das letras assentarem
         tl.to({}, { duration: 0.4 }); // respiro
 
         if (!last) {
-          tl.to(chars, { yPercent: -110, opacity: 0, stagger: 0.01, duration: 0.4, ease: 'power2.in' });
-          tl.to(note, { opacity: 0, duration: 0.2 }, '<');
-          tl.set(step, { visibility: 'hidden' });
+          tl.to(step, { autoAlpha: 0, yPercent: -12, duration: 0.4, ease: 'power2.in' });
         } else {
           // painéis em dither entram pelas laterais e depois cobrem a tela
           tl.to(left, { clipPath: 'inset(36% 72% 36% 0%)', duration: 0.6 }, '<-0.4');
           tl.to(right, { clipPath: 'inset(36% 0% 36% 72%)', duration: 0.6 }, '<');
-          tl.to(note, { opacity: 0, duration: 0.2 });
+          tl.to(step.querySelector('.traj-note'), { autoAlpha: 0, duration: 0.2 });
           tl.to(left, { clipPath: 'inset(0% 50% 0% 0%)', duration: 0.8, ease: 'power2.inOut' }, '<');
           tl.to(right, { clipPath: 'inset(0% 0% 0% 50%)', duration: 0.8, ease: 'power2.inOut' }, '<');
           tl.to({}, { duration: 0.5 });

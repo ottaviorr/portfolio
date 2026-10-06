@@ -84,7 +84,8 @@ const person = {
     <script>
       import Lenis from 'lenis';
       if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
-        new Lenis({ autoRaf: true, anchors: { offset: -80 } });
+        // âncoras pulam direto (immediate): rolar suave atravessaria a Trajetória presa (5 telas) e piscaria
+        new Lenis({ autoRaf: true, anchors: { offset: -80, immediate: true } });
       }
       // posição do cursor pra grade de pixels de qualquer [data-spot]
       addEventListener('pointermove', (e) => {
