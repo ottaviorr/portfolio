@@ -139,6 +139,14 @@ const d = t(lang).path;
   .is-staged .traj-half.right {
     clip-path: inset(36% 0 36% 100%);
   }
+  /* celular: camadas próprias pros elementos que mexem durante a rolagem */
+  @media (max-width: 760px), (pointer: coarse) {
+    .is-staged .traj-step,
+    .is-staged .traj-half,
+    .is-staged .traj-flip {
+      will-change: transform, opacity, clip-path;
+    }
+  }
 </style>
 
 <script>
@@ -150,6 +158,10 @@ const d = t(lang).path;
 
   if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
     gsap.registerPlugin(ScrollTrigger, SplitText);
+    // celular: a barra de endereço some/aparece e muda a altura da tela; sem isso a seção presa
+    // recalcula no meio da rolagem e dá tranco
+    ScrollTrigger.config({ ignoreMobileResize: true });
+    const mobile = matchMedia('(max-width: 760px), (pointer: coarse)').matches;
     document.fonts.ready.then(() => {
       section.classList.add('is-staged');
       const steps = [...section.querySelectorAll<HTMLElement>('.traj-step')];
@@ -157,17 +169,27 @@ const d = t(lang).path;
 
       const tl = gsap.timeline({
         defaults: { ease: 'power3.out' },
-        scrollTrigger: { trigger: section, start: 'top top', end: () => `+=${innerHeight * 5}`, pin: true, scrub: 0.6 },
+        // altura medida uma vez (não segue a barra de endereço); no celular, menos rolagem e scrub mais macio
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: `+=${Math.round(innerHeight * (mobile ? 3.6 : 5))}`,
+          pin: true,
+          scrub: mobile ? 1 : 0.6,
+          anticipatePin: 1,
+        },
       });
 
       // o 1º passo já se monta enquanto a seção entra na tela (sem tela vazia)
       const intro = gsap.timeline({
         defaults: { ease: 'power3.out' },
-        scrollTrigger: { trigger: section, start: 'top 75%', end: 'top 5%', scrub: 0.6 },
+        scrollTrigger: { trigger: section, start: 'top 75%', end: 'top 5%', scrub: mobile ? 1 : 0.6 },
       });
 
       steps.forEach((step, i) => {
-        const chars = SplitText.create(step.querySelectorAll('.traj-when, .traj-what'), { type: 'words,chars', aria: 'none' }).chars;
+        // celular: anima palavras (poucos elementos, sem rotação) em vez de letra por letra
+        const split = SplitText.create(step.querySelectorAll('.traj-when, .traj-what'), { type: mobile ? 'words' : 'words,chars', aria: 'none' });
+        const chars = mobile ? split.words : split.chars;
         const note = step.querySelector('.traj-note');
         const last = i === steps.length - 1;
 
@@ -180,7 +202,12 @@ const d = t(lang).path;
         // mesma propriedade — antes, rolando rápido, a intro atrasada reacendia o passo 1.
         const enter = i === 0 ? intro : tl;
         if (i > 0) tl.set(step, { autoAlpha: 1 });
-        enter.from(chars, { yPercent: 110, rotate: 10, opacity: 0, stagger: 0.025, duration: 0.6 });
+        enter.from(
+          chars,
+          mobile
+            ? { yPercent: 60, opacity: 0, stagger: 0.08, duration: 0.6, force3D: true }
+            : { yPercent: 110, rotate: 10, opacity: 0, stagger: 0.025, duration: 0.6 },
+        );
         enter.from(note, { opacity: 0, y: 16, duration: 0.3 }, '>-0.1'); // só depois das letras assentarem
         tl.to({}, { duration: 0.4 }); // respiro
 
