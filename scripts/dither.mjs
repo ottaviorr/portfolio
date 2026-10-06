@@ -1,17 +1,19 @@
 // Gera a capa em dither (azul + rosa) de cada projeto e o fundo da Trajetória.
 // Uso: npm run dither   → lê src/assets/projects/<slug>/desktop-1.png e escreve cover.png na mesma pasta.
-// A capa sai pequena (360px) com 4 cores; o CSS amplia com `image-rendering: pixelated`.
+// Resolução perto da exibida (1080px) → ponto fino, não pixelão. 6 cores, do escuro ao claro.
 import sharp from 'sharp';
 import { readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const W = 360;
-const H = 225;
+const W = 1080;
+const H = 675;
 // escuro → claro
 const PALETTE = [
   [0x07, 0x0b, 0x14], // bg
   [0x06, 0x71, 0xb7], // blue
+  [0x67, 0xa3, 0xd9], // blue-light
   [0xf8, 0xb7, 0xcd], // pink
+  [0xf6, 0xd2, 0xe0], // pink-light
   [0xc8, 0xe7, 0xf5], // ice
 ];
 const BAYER = [
@@ -58,8 +60,8 @@ const FIELD = [
   [0xf8, 0xb7, 0xcd], // pink
   [0xf6, 0xd2, 0xe0], // pink-light
 ];
-const FW = 384;
-const FH = 216;
+const FW = 960;
+const FH = 540;
 const field = Buffer.alloc(FW * FH);
 for (let y = 0; y < FH; y++) {
   for (let x = 0; x < FW; x++) {
