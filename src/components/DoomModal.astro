@@ -123,7 +123,8 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
   /* ── base / desktop: janela retrô em pixel ───────────────────── */
   .doom {
     margin: auto; /* o reset global zera a margem e tira o <dialog> do centro */
-    width: min(92vw, 880px);
+    /* largura limitada também pela altura: a tela é 16:10 e a moldura soma ~270px */
+    width: min(92vw, 880px, calc((94svh - 270px) * 1.6));
     max-height: 96svh;
     padding: 12px; /* espaço pra borda e sombra em pixel */
     border: 0;
@@ -554,8 +555,21 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
     }
   }
 
-  /* ── toque: Game Boy ──────────────────────────────────────────── */
-  @media (hover: none), (pointer: coarse) {
+  /* janela em telas médias: título curto e manual em duas linhas */
+  @media (max-width: 1000px) {
+    .win-sub {
+      display: none;
+    }
+    .manual {
+      grid-template-columns: auto 1fr;
+    }
+    .m-rest {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* ── toque OU tela estreita: Game Boy (também no modo celular do DevTools sem toque) ── */
+  @media (hover: none), (pointer: coarse), (max-width: 760px) {
     .doom {
       width: 100vw;
       max-width: none;
