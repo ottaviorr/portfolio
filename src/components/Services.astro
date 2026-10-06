@@ -21,7 +21,7 @@ const d = t(lang).services;
           <p class="text">{s.text}</p>
           <p class="sr-only">{d.includes}:</p>
           <ul class="tags">
-            {s.tags.map((tag, j) => <li style={`--i:${j}`}>{tag}</li>)}
+            {s.tags.map((tag) => <li>{tag}</li>)}
           </ul>
         </li>
       ))
@@ -121,69 +121,22 @@ const d = t(lang).services;
     }
   }
 
-  /* celular (sem hover): o card que passa pelo meio da tela "acende" —
-     borda na cor dele, varredura da grade de pixels, número pulando em degraus e tags entrando */
-  @media ((hover: none) or (max-width: 760px)) and (prefers-reduced-motion: no-preference) {
-    .card {
-      transition:
-        transform 500ms var(--ease-out),
-        border-color 400ms,
-        box-shadow 400ms;
-    }
-    .card.is-active {
-      border-color: color-mix(in srgb, var(--accent) 85%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), 0 18px 40px -20px color-mix(in srgb, var(--accent) 45%, transparent);
-      transform: scale(1.02);
-    }
-    .card.is-active::before {
-      display: block;
-      opacity: 0.55;
-      --my: 130px; /* --my é registrado como <length> (px), % seria inválido */
-      animation: card-scan 1.3s var(--ease-out) both;
-    }
-    .card.is-active .num {
-      animation: num-pop 450ms steps(4) both;
-    }
-    .card.is-active .tags li {
-      animation: tag-in 420ms var(--ease-out) both;
-      animation-delay: calc(var(--i) * 90ms + 250ms);
+  /* celular: só a entrada, um pouco mais marcada (sobe mais e cresce de leve) */
+  @supports (animation-timeline: view()) {
+    @media ((hover: none) or (max-width: 760px)) and (prefers-reduced-motion: no-preference) {
+      .card[data-rise] {
+        animation-name: card-in;
+        animation-range: entry 0% entry 90%;
+      }
     }
   }
-  @keyframes card-scan {
-    from {
-      --mx: -200px;
-    }
-    to {
-      --mx: 300px;
-    }
-  }
-  @keyframes num-pop {
-    0% {
-      scale: 0.6;
-      opacity: 0.3;
-    }
-    60% {
-      scale: 1.15;
-    }
-    100% {
-      scale: 1;
-      opacity: 1;
-    }
-  }
-  @keyframes tag-in {
+  @keyframes card-in {
     from {
       opacity: 0;
-      translate: 0 10px;
+      translate: 0 72px;
+      scale: 0.94;
     }
   }
 </style>
 
-<script>
-  // celular: marca o card que está cruzando o meio da tela (no desktop a classe não tem efeito)
-  const io = new IntersectionObserver(
-    (entries) => entries.forEach((e) => e.target.classList.toggle('is-active', e.isIntersecting)),
-    { rootMargin: '-40% 0px -40% 0px' },
-  );
-  document.querySelectorAll('.card').forEach((c) => io.observe(c));
-</script>
 
