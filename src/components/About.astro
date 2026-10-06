@@ -72,25 +72,75 @@ const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
 
     <div class="about-body">
       <p class="about-text" set:html={d.text} />
-      <h3 class="meta off-title">{d.offTitle}</h3>
-      <ul class="off">
-        {
-          d.off.map((o, i) => (
-            <li data-rise style={`--accent: ${accents[i]}`}>
-              <svg class="sprite" viewBox="0 0 14 9" shape-rendering="crispEdges" aria-hidden="true">
-                {pixels[i].map((p) => (
-                  <rect x={p.x} y={p.y} width="1" height="1" class:list={[p.alt && 'alt']} style={`--d:${p.x + p.y}`} />
-                ))}
-              </svg>
-              <strong>{o.name}</strong>
-              <span>{o.text}</span>
-            </li>
-          ))
-        }
-      </ul>
+      <h3 class="meta off-title" id="off-title">{d.offTitle}</h3>
+      <!-- menu de videogame: lista de seleção à esquerda, "tela" com o item escolhido à direita.
+           Sem JS, todos os painéis ficam visíveis em sequência. -->
+      <div class="off" data-rise>
+        <div class="off-menu" role="tablist" aria-labelledby="off-title">
+          {
+            d.off.map((o, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`off-tab-${i}`}
+                aria-controls={`off-panel-${i}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+                style={`--accent: ${accents[i]}`}
+              >
+                <span class="caret" aria-hidden="true">▶</span>
+                <span class="slot" aria-hidden="true">0{i + 1}</span>
+                {o.name}
+              </button>
+            ))
+          }
+        </div>
+        <div class="off-screen">
+          {
+            d.off.map((o, i) => (
+              <div class="off-panel" role="tabpanel" id={`off-panel-${i}`} aria-labelledby={`off-tab-${i}`} style={`--accent: ${accents[i]}`}>
+                <svg class="sprite" viewBox="0 0 14 9" shape-rendering="crispEdges" aria-hidden="true">
+                  {pixels[i].map((p) => (
+                    <rect x={p.x} y={p.y} width="1" height="1" class:list={[p.alt && 'alt']} style={`--d:${p.x + p.y}`} />
+                  ))}
+                </svg>
+                <p class="off-count meta" aria-hidden="true">0{i + 1} / 0{d.off.length}</p>
+                <strong>{o.name}</strong>
+                <p class="off-text">{o.text}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+  // abas acessíveis: hover/clique/setas trocam o item; só o painel ativo aparece
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('.off-menu [role=tab]')];
+  const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')!)!);
+  const select = (i: number, focus = false) => {
+    tabs.forEach((t, j) => {
+      const on = i === j;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      panels[j].hidden = !on;
+    });
+    if (focus) tabs[i].focus();
+  };
+  select(0);
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(i));
+    t.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && select(i));
+    t.addEventListener('keydown', (e) => {
+      const k = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+      if (!k) return;
+      e.preventDefault();
+      select((i + k + tabs.length) % tabs.length, true);
+    });
+  });
+</script>
 
 <style>
   .label {
@@ -207,30 +257,107 @@ const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
     }
   }
 
-  /* fora do expediente */
+  /* um pouco de mim: menu de videogame */
   .off-title {
     margin-top: var(--space-6);
     margin-bottom: var(--space-2);
   }
   .off {
-    list-style: none;
-    padding: 0;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);
     gap: var(--space-4);
+    align-items: stretch;
   }
-  /* sem caixa: sprite em pixel art + texto, separados só por uma linha (menos "card padrão") */
-  .off li {
+  .off-menu {
     display: grid;
     align-content: start;
-    gap: 0.5rem;
-    padding-top: var(--space-3);
     border-top: 1px solid var(--line);
   }
+  .off-menu button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 56px;
+    padding: 0 0.25rem;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: -0.02em;
+    text-align: left;
+    transition: color 200ms;
+  }
+  .slot {
+    font-family: var(--font-body);
+    font-size: var(--fs-meta);
+    font-weight: 500;
+  }
+  .caret {
+    width: 0.8em;
+    font-size: 0.75rem;
+    color: var(--accent);
+    opacity: 0;
+  }
+  .off-menu [aria-selected='true'] {
+    color: var(--white);
+  }
+  .off-menu [aria-selected='true'] .caret {
+    opacity: 1;
+    animation: blink 1s steps(1) infinite;
+  }
+  .off-menu [aria-selected='true'] .slot {
+    color: var(--accent);
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* "tela": grade de pontos bem leve + cantos em colchete, sem caixa fechada */
+  .off-screen {
+    position: relative;
+    padding: var(--space-4);
+    background: radial-gradient(circle, color-mix(in srgb, var(--ice) 10%, transparent) 1px, transparent 1.5px) 0 0 / 12px 12px;
+  }
+  .off-screen::before,
+  .off-screen::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--muted);
+  }
+  .off-screen::before {
+    top: 0;
+    left: 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+  .off-screen::after {
+    right: 0;
+    bottom: 0;
+    border-left: 0;
+    border-top: 0;
+  }
+  .off-panel {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .off-panel + .off-panel {
+    margin-top: var(--space-4); /* só sem JS, quando todos aparecem */
+  }
+  .off-panel[hidden] {
+    display: none;
+  }
   .sprite {
-    width: 84px; /* 14 colunas × 6px: escala inteira, quadradinho nítido */
-    height: 54px;
-    margin-bottom: var(--space-1);
+    width: 140px; /* 14 colunas × 10px: escala inteira, quadradinho nítido */
+    height: 90px;
+    margin-bottom: var(--space-2);
   }
   .sprite rect {
     fill: var(--accent);
@@ -238,36 +365,43 @@ const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
   .sprite rect.alt {
     fill: color-mix(in srgb, var(--accent) 55%, var(--white));
   }
-  /* no hover os pixels se montam em diagonal, um a um */
-  .off li:hover .sprite rect {
-    animation: px-build 420ms steps(2) both;
-    animation-delay: calc(var(--d) * 22ms);
+  /* ao trocar de item, o sprite se monta pixel a pixel em diagonal */
+  .off-panel:not([hidden]) .sprite rect {
+    animation: px-build 360ms steps(2) both;
+    animation-delay: calc(var(--d) * 20ms);
   }
   @keyframes px-build {
     from {
       opacity: 0;
     }
   }
+  .off-count {
+    color: var(--accent);
+  }
+  .off-panel strong {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    letter-spacing: -0.03em;
+  }
+  .off-text {
+    max-width: 44ch;
+    color: var(--muted);
+  }
   @media (prefers-reduced-motion: reduce) {
-    .off li:hover .sprite rect {
+    .off-panel .sprite rect,
+    .off-menu [aria-selected='true'] .caret {
       animation: none;
     }
-  }
-  .off strong {
-    font-family: var(--font-display);
-    font-size: 1.125rem;
-    letter-spacing: -0.02em;
-    color: var(--white);
-  }
-  .off span {
-    color: var(--muted);
-    font-size: 0.9375rem;
   }
 
   @media (max-width: 900px) {
     .about-grid,
     .off {
       grid-template-columns: 1fr;
+    }
+    .sprite {
+      width: 112px;
+      height: 72px;
     }
     .about-grid {
       gap: var(--space-8);
