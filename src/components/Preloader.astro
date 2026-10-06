@@ -1,7 +1,10 @@
 ---
-// Abertura (~3s): as letras do nome entram piscando azul/rosa e assentam em branco.
+// Abertura (~3s): o handle entra letra a letra em degradê azul/rosa e assenta em branco;
+// o ponto final assenta em rosa, como em todos os títulos do site.
 // Só na 1ª visita da sessão e nunca com reduced-motion. Sem JS, não aparece.
-const letters = [...'Otávio Herdy'];
+import { site } from '../site';
+
+const letters = [...site.handle];
 ---
 
 <script is:inline>
@@ -15,7 +18,7 @@ const letters = [...'Otávio Herdy'];
 
 <div class="preloader" aria-hidden="true">
   <p>
-    {letters.map((ch, i) => <span style={`--i:${i}`}>{ch === ' ' ? ' ' : ch}</span>)}
+    {letters.map((ch, i) => <span style={`--i:${i}`}>{ch}</span>)}<span class="pre-dot" style={`--i:${letters.length}`}>.</span>
   </p>
 </div>
 
@@ -46,6 +49,16 @@ const letters = [...'Otávio Herdy'];
     animation:
       pre-in 1300ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i) * 55ms) both,
       pre-blink 1700ms ease-in-out calc(var(--i) * 60ms) both;
+  }
+  /* o ponto entra igual, mas termina rosa (não branco) */
+  .preloader .pre-dot {
+    animation:
+      pre-in 1300ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i) * 55ms) both,
+      pre-dot 1700ms ease-in-out calc(var(--i) * 55ms) both;
+  }
+  @keyframes pre-dot {
+    0% { color: var(--blue-light); }
+    100% { color: var(--pink); }
   }
   @keyframes pre-in {
     from {
