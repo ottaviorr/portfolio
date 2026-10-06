@@ -83,6 +83,14 @@ const person = {
       if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
         new Lenis({ autoRaf: true, anchors: { offset: -80 } });
       }
+      // posição do cursor pra grade de pixels de qualquer [data-spot]
+      addEventListener('pointermove', (e) => {
+        const el = (e.target as Element).closest<HTMLElement>('[data-spot]');
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+        el.style.setProperty('--my', `${e.clientY - r.top}px`);
+      });
     </script>
   </body>
 </html>

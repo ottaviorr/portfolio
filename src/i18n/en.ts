@@ -65,8 +65,11 @@ export const en: Dict = {
 
   about: {
     title: 'About.',
-    text: `I'm Otávio, from Minas Gerais, Brazil, in my 8th semester of Computer Science. I believe <mark>every business deserves a website that lives up to its work</mark>. Before I design anything, I do the research: who the customers are, what competitors do, what makes someone trust a brand. Then I sweat the details so <mark class="pink">the site makes the business look its best</mark>, loads fast and is easy to find.`,
+    statement: 'Every business deserves a website that lives up to its work.',
+    text: `I'm Otávio, from Minas Gerais, Brazil. Before I design anything, I do the research: who the customers are, what competitors do, what makes someone trust a brand. Then I sweat the details so <mark>the site makes the business look its best</mark>, <mark class="pink">loads fast and is easy to find</mark>.`,
     photoAlt: 'Otávio in a pink cap and shirt, throwing up the rock horns',
+    badge: 'Computer Science · 8th semester · ',
+    caption: 'ottaviorr, at some show',
     offTitle: 'Off the clock',
     off: [
       { name: 'Rock & Taylor Swift', text: 'Headphones on from first commit to last deploy. Friendship bracelets included.' },
@@ -75,7 +78,7 @@ export const en: Dict = {
     ],
   },
 
-  toolkit: { title: 'Toolkit.', design: 'Design', code: 'Code' },
+  toolkit: { title: 'Toolkit.', intro: 'What I use to get ideas off the page.', design: 'Design', code: 'Code' },
 
   contact: {
     marquee: "Let's talk",

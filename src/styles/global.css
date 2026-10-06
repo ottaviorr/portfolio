@@ -128,3 +128,51 @@ html.has-cursor * {
 .section {
   padding: var(--space-section) var(--gutter);
 }
+
+/* Grade de pixels que acende em volta do cursor (eco do dither). Use data-spot + --accent. */
+[data-spot] {
+  --mx: -999px;
+  --my: -999px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+[data-spot]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle, var(--accent, var(--blue-light)) 1.2px, transparent 1.7px) 0 0 / 12px 12px;
+  mask-image: radial-gradient(circle 180px at var(--mx) var(--my), #000, transparent);
+  opacity: 0;
+  transition: opacity 400ms;
+  pointer-events: none;
+}
+[data-spot]:hover::before {
+  opacity: 0.5;
+}
+
+/* Entrada no scroll (CSS nativo; sem suporte, o card só aparece parado) */
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 48px;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-rise] {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+    [data-rise]:nth-child(even) {
+      animation-range: entry 15% entry 85%; /* coluna da direita chega um pouco depois */
+    }
+  }
+}
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  [data-spot]::before {
+    display: none;
+  }
+}

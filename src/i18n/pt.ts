@@ -65,8 +65,11 @@ export const pt = {
 
   about: {
     title: 'Sobre.',
-    text: 'Sou o Otávio, de Minas Gerais, e estou no 8º período de Ciência da Computação. Acredito que <mark>todo negócio merece um site à altura do que entrega</mark>. Antes de desenhar, eu pesquiso: quem é o cliente, o que a concorrência faz, o que faz alguém confiar numa marca. Depois, cuido de cada detalhe para que <mark class="pink">o site valorize a empresa</mark>, abra rápido e seja fácil de achar.',
+    statement: 'Todo negócio merece um site à altura do que entrega.',
+    text: 'Sou o Otávio, de Minas Gerais. Antes de desenhar, eu pesquiso: quem é o cliente, o que a concorrência faz, o que faz alguém confiar numa marca. Depois, cuido de cada detalhe para que <mark>o site valorize a empresa</mark>, <mark class="pink">abra rápido e seja fácil de achar</mark>.',
     photoAlt: 'Otávio de boné e camisa rosa, fazendo o sinal do rock com a mão',
+    badge: 'Ciência da Computação · 8º período · ',
+    caption: 'ottaviorr, em algum show',
     offTitle: 'Fora do expediente',
     off: [
       { name: 'Rock e Taylor Swift', text: 'Fone no ouvido do primeiro commit ao deploy. A pulseirinha da amizade tá no pulso.' },
@@ -75,7 +78,7 @@ export const pt = {
     ],
   },
 
-  toolkit: { title: 'Ferramentas.', design: 'Design', code: 'Código' },
+  toolkit: { title: 'Ferramentas.', intro: 'O que eu uso pra tirar as ideias do papel.', design: 'Design', code: 'Código' },
 
   contact: {
     marquee: 'Bora conversar',

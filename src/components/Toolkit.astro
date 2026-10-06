@@ -5,94 +5,112 @@ import { t, type Lang } from '../i18n';
 
 const { lang } = Astro.props as { lang: Lang };
 const d = t(lang).toolkit;
-const groups = [
-  { name: d.design, tools: toolkit.design, accent: 'var(--pink)' },
-  { name: d.code, tools: toolkit.code, accent: 'var(--blue-light)' },
+const tools = [
+  ...toolkit.design.map((tool) => ({ ...tool, group: d.design, accent: 'var(--pink)' })),
+  ...toolkit.code.map((tool) => ({ ...tool, group: d.code, accent: 'var(--blue-light)' })),
 ];
 ---
 
 <section class="section">
-  <ColorTitle as="h2" class="h1" text={d.title} dot="blue" />
-  <div class="groups">
+  <div class="head">
+    <ColorTitle as="h2" class="h1" text={d.title} dot="blue" />
+    <p class="intro">{d.intro}</p>
+  </div>
+
+  <ul class="tiles">
     {
-      groups.map((g) => (
-        <div class="group" style={`--accent: ${g.accent}`}>
-          <h3 class="meta">{g.name}</h3>
-          <ul>
-            {g.tools.map((tool) => (
-              <li>
-                {tool.icon ? (
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d={tool.icon.path} />
-                  </svg>
-                ) : (
-                  <span class="mono" aria-hidden="true">{tool.mono}</span>
-                )}
-                {tool.name}
-              </li>
-            ))}
-          </ul>
-        </div>
+      tools.map((tool) => (
+        <li class="tile" data-spot data-rise style={`--accent: ${tool.accent}`}>
+          {tool.icon ? (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d={tool.icon.path} />
+            </svg>
+          ) : (
+            <span class="mono" aria-hidden="true">{tool.mono}</span>
+          )}
+          <span class="name">{tool.name}</span>
+          <span class="group meta">{tool.group}</span>
+        </li>
       ))
     }
-  </div>
+  </ul>
 </section>
 
 <style>
-  .groups {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4) var(--space-8);
-    margin-top: var(--space-8);
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: var(--space-3);
   }
-  .group {
-    border-top: 1px solid var(--line);
-    padding-top: var(--space-3);
+  .intro {
+    max-width: 28ch;
+    color: var(--muted);
+    font-size: var(--fs-body-lg);
   }
-  ul {
+  .tiles {
     list-style: none;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-    gap: var(--space-3) var(--space-2);
-    margin-top: var(--space-3);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin-top: var(--space-8);
   }
-  li {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-weight: 500;
-    color: var(--muted);
-    transition: color 300ms;
+  .tile {
+    display: grid;
+    grid-template-rows: 1fr auto auto;
+    gap: 0.25rem;
+    min-height: 11rem;
+    padding: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    transition:
+      border-color 300ms,
+      transform 400ms var(--ease-out);
   }
-  li:hover {
-    color: var(--white);
+  .tile:hover {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    transform: translateY(-4px);
   }
   svg,
   .mono {
-    flex: none;
-    width: 1.5rem;
-    height: 1.5rem;
-    fill: currentColor;
-    transition: color 300ms, fill 300ms;
+    width: 40px;
+    height: 40px;
+    fill: var(--white);
+    color: var(--white);
+    transition:
+      fill 300ms,
+      color 300ms;
   }
   .mono {
     display: grid;
     place-items: center;
-    border: 1.5px solid currentColor;
-    border-radius: 5px;
-    font-size: 0.625rem;
-    font-weight: 700;
+    border: 2px solid currentColor;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 800;
     letter-spacing: -0.02em;
   }
-  li:hover svg,
-  li:hover .mono {
-    color: var(--accent);
+  .tile:hover svg {
     fill: var(--accent);
   }
-  @media (max-width: 760px) {
-    .groups {
-      grid-template-columns: 1fr;
+  .tile:hover .mono {
+    color: var(--accent);
+  }
+  .name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+  @media (max-width: 900px) {
+    .tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .tile {
+      min-height: 9rem;
     }
   }
 </style>

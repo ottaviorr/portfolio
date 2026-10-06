@@ -15,7 +15,7 @@ const d = t(lang).services;
   <ol class="cards">
     {
       d.items.map((s, i) => (
-        <li class="card" style={`--accent: var(${i % 2 ? '--pink' : '--blue-light'})`}>
+        <li class="card" data-spot data-rise style={`--accent: var(${i % 2 ? '--pink' : '--blue-light'})`}>
           <span class="num" aria-hidden="true">0{i + 1}</span>
           <h3 class="h3">{s.name}</h3>
           <p class="text">{s.text}</p>
@@ -51,37 +51,21 @@ const d = t(lang).services;
     margin-top: var(--space-8);
   }
   .card {
-    --mx: -999px;
-    --my: -999px;
-    position: relative;
-    isolation: isolate;
     display: grid;
     grid-template-rows: auto auto 1fr auto;
     gap: var(--space-2);
     min-height: 20rem;
     padding: var(--space-4);
-    overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 16px;
     background: var(--surface);
-    transition: border-color 300ms;
-  }
-  /* grade de pixels do hero, acendendo em volta do cursor dentro do card */
-  .card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: radial-gradient(circle, var(--accent) 1.2px, transparent 1.7px) 0 0 / 12px 12px;
-    mask-image: radial-gradient(circle 180px at var(--mx) var(--my), #000, transparent);
-    opacity: 0;
-    transition: opacity 400ms;
+    transition:
+      border-color 300ms,
+      transform 400ms var(--ease-out);
   }
   .card:hover {
     border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-  }
-  .card:hover::before {
-    opacity: 0.5;
+    transform: translateY(-6px);
   }
   .num {
     font-family: var(--font-display);
@@ -122,19 +106,5 @@ const d = t(lang).services;
       padding: var(--space-3);
     }
   }
-  @media (hover: none), (prefers-reduced-motion: reduce) {
-    .card::before {
-      display: none;
-    }
-  }
 </style>
 
-<script>
-  for (const card of document.querySelectorAll<HTMLElement>('.card')) {
-    card.addEventListener('pointermove', (e) => {
-      const r = card.getBoundingClientRect();
-      card.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      card.style.setProperty('--my', `${e.clientY - r.top}px`);
-    });
-  }
-</script>

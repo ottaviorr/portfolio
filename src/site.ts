@@ -16,7 +16,6 @@ type Tool = { name: string; icon?: { path: string }; mono?: string };
 export const toolkit: { design: Tool[]; code: Tool[] } = {
   design: [
     { name: 'Figma', icon: siFigma },
-    { name: 'After Effects', mono: 'Ae' },
     { name: 'GSAP', icon: siGsap },
   ],
   code: [
