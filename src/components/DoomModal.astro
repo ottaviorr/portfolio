@@ -1,0 +1,350 @@
+---
+// Easter egg: DOOM (shareware) rodando em WebAssembly (doomgeneric) num <dialog>.
+// Nada é baixado até alguém clicar em [data-doom-open]: ~4.5MB em /public/doom.
+// Desktop: teclado. Celular/toque: tela em cima e controle (d-pad + botões) embaixo.
+import { t, type Lang } from '../i18n';
+
+const { lang } = Astro.props as { lang: Lang };
+const d = t(lang).about.doom;
+---
+
+<dialog class="doom" aria-label={d.title}>
+  <div class="doom-bar">
+    <span class="doom-title">{d.title}</span>
+    <button type="button" class="doom-close" data-doom-close>{d.close} <span aria-hidden="true">✕</span></button>
+  </div>
+
+  <div class="doom-screen">
+    <canvas width="640" height="400"></canvas>
+    <p class="doom-loading">{d.loading}</p>
+  </div>
+
+  <p class="doom-hint meta">{d.hint}</p>
+
+  <!-- controle de toque: data-key = código de tecla do DOOM (doomkeys.h) -->
+  <div class="pad" aria-hidden="true">
+    <div class="dpad">
+      <button type="button" class="up" data-key="173">▲</button>
+      <button type="button" class="left" data-key="172">◀</button>
+      <button type="button" class="right" data-key="174">▶</button>
+      <button type="button" class="down" data-key="175">▼</button>
+    </div>
+    <div class="meta-btns">
+      <button type="button" data-key="27">Esc</button>
+      <button type="button" data-key="13">{d.start}</button>
+    </div>
+    <div class="ab">
+      <button type="button" class="b" data-key="162">{d.use}</button>
+      <button type="button" class="a" data-key="163">{d.fire}</button>
+    </div>
+  </div>
+</dialog>
+
+<style is:global>
+  .doom {
+    margin: auto; /* o reset global zera a margem e tira o <dialog> do centro */
+    width: min(92vw, 900px);
+    max-height: 96svh;
+    padding: var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--ink);
+    color: var(--paper);
+    overflow: auto;
+  }
+  .doom::backdrop {
+    background: rgb(7 11 20 / 0.85);
+    backdrop-filter: blur(4px);
+  }
+  .doom-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+  .doom-close {
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 0.875rem;
+  }
+  .doom-close:hover {
+    border-color: var(--pink);
+  }
+  .doom-screen {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #000;
+  }
+  .doom-screen canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+  .doom-loading {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--pink);
+  }
+  .doom.is-ready .doom-loading {
+    display: none;
+  }
+  .doom-hint {
+    margin-top: var(--space-2);
+    color: color-mix(in srgb, var(--paper) 60%, transparent);
+  }
+
+  /* controle de toque: só aparece em telas de toque */
+  .pad {
+    display: none;
+  }
+  @media (hover: none), (pointer: coarse) {
+    .doom {
+      width: 100vw;
+      max-width: none;
+      height: 100svh;
+      max-height: none;
+      margin: 0;
+      border: 0;
+      border-radius: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr); /* sem isso o canvas (640px nativo) estoura a tela */
+      grid-template-rows: auto auto 1fr;
+    }
+    .doom:not([open]) {
+      display: none;
+    }
+    .doom-hint {
+      display: none;
+    }
+    .pad {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-1);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    .pad button {
+      border: 0;
+      background: var(--surface);
+      color: var(--paper);
+      font: inherit;
+      font-weight: 700;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pad button.is-down {
+      background: var(--blue);
+    }
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 48px);
+      grid-template-rows: repeat(3, 48px);
+    }
+    .dpad button {
+      border-radius: 8px;
+      font-size: 1.1rem;
+    }
+    .dpad .up { grid-area: 1 / 2; }
+    .dpad .left { grid-area: 2 / 1; }
+    .dpad .right { grid-area: 2 / 3; }
+    .dpad .down { grid-area: 3 / 2; }
+    .meta-btns {
+      justify-self: center;
+      display: grid;
+      gap: var(--space-1);
+    }
+    .meta-btns button {
+      min-height: 36px;
+      padding: 0 0.8rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+    }
+    .ab {
+      justify-self: end;
+      display: grid;
+      grid-template-columns: repeat(2, 58px);
+      gap: var(--space-1);
+      align-items: end;
+    }
+    .ab button {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+    }
+    .ab .a {
+      background: var(--pink);
+      color: var(--ink);
+      margin-bottom: 28px; /* A mais alto, como num controle de verdade */
+    }
+    .ab .a.is-down {
+      background: var(--pink-light);
+    }
+  }
+</style>
+
+<script>
+  type Doom = {
+    _doomgeneric_Create(argc: number, argv: number): void;
+    _doomgeneric_Tick(): void;
+    _DG_GetFrameBuffer(): number;
+    _DG_PushKeyEvent(pressed: number, key: number): void;
+    _malloc(n: number): number;
+    _free(p: number): void;
+    HEAPU8: Uint8Array;
+    setValue(p: number, v: number, t: string): void;
+    FS_createPath(parent: string, path: string, r: boolean, w: boolean): void;
+    FS_createDataFile(parent: string, name: string, data: Uint8Array, r: boolean, w: boolean): void;
+  };
+
+  const dialog = document.querySelector<HTMLDialogElement>('dialog.doom')!;
+  const canvas = dialog.querySelector('canvas')!;
+  const ctx = canvas.getContext('2d')!;
+  const W = 640;
+  const H = 400;
+  let doom: Doom | null = null;
+  let booting: Promise<void> | null = null;
+  let running = false;
+
+  // teclado → códigos do doomkeys.h
+  const KEYS: Record<string, number> = {
+    ArrowUp: 0xad, KeyW: 0xad,
+    ArrowDown: 0xaf, KeyS: 0xaf,
+    ArrowLeft: 0xac, ArrowRight: 0xae,
+    KeyA: 0xa0, KeyD: 0xa1, // strafe
+    Space: 0xa2, KeyE: 0xa2, // usar
+    ControlLeft: 0xa3, ControlRight: 0xa3, KeyF: 0xa3, // atirar
+    ShiftLeft: 0x80 + 0x36, ShiftRight: 0x80 + 0x36, // correr
+    Enter: 13, Escape: 27, Tab: 9, Backspace: 127,
+  };
+  const toDoom = (e: KeyboardEvent) =>
+    KEYS[e.code] ?? (e.key.length === 1 ? e.key.toLowerCase().charCodeAt(0) : undefined); // letras/números (Y/N do menu, armas 1-7)
+
+  function loadScript(src: string) {
+    return new Promise<void>((ok, fail) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = () => ok();
+      s.onerror = fail;
+      document.head.append(s);
+    });
+  }
+
+  async function boot() {
+    const [wasm, wad] = await Promise.all([
+      fetch('/doom/doom.wasm').then((r) => r.arrayBuffer()),
+      fetch('/doom/doom1.wad').then((r) => r.arrayBuffer()),
+      loadScript('/doom/doom.js'),
+    ]);
+    const create = (window as unknown as { createDoomModule: (m: object) => Promise<Doom> }).createDoomModule;
+    doom = await create({
+      wasmBinary: wasm,
+      print: () => {},
+      printErr: () => {},
+      preRun: [
+        (m: Doom) => {
+          m.FS_createPath('/', 'doom', true, true);
+          m.FS_createDataFile('/doom', 'doom1.wad', new Uint8Array(wad), true, false);
+        },
+      ],
+    });
+    // argv = ["doom", "-iwad", "/doom/doom1.wad"]
+    const args = ['doom', '-iwad', '/doom/doom1.wad'];
+    const ptrs = args.map((a) => {
+      const p = doom!._malloc(a.length + 1);
+      [...a].forEach((c, i) => doom!.setValue(p + i, c.charCodeAt(0), 'i8'));
+      doom!.setValue(p + a.length, 0, 'i8');
+      return p;
+    });
+    const argv = doom._malloc(ptrs.length * 4);
+    ptrs.forEach((p, i) => doom!.setValue(argv + i * 4, p, 'i32'));
+    doom._doomgeneric_Create(args.length, argv);
+    dialog.classList.add('is-ready');
+  }
+
+  const image = ctx.createImageData(W, H);
+  const out = new Uint32Array(image.data.buffer);
+  function frame() {
+    if (!running || !doom) return;
+    doom._doomgeneric_Tick();
+    // framebuffer ARGB (32 bits) → ImageData RGBA: troca R e B
+    const src = new Uint32Array(doom.HEAPU8.buffer, doom._DG_GetFrameBuffer(), W * H);
+    for (let i = 0; i < src.length; i++) {
+      const p = src[i];
+      out[i] = 0xff000000 | ((p & 0xff) << 16) | (p & 0xff00) | ((p >> 16) & 0xff);
+    }
+    ctx.putImageData(image, 0, 0);
+    requestAnimationFrame(frame);
+  }
+
+  async function open() {
+    dialog.showModal();
+    booting ??= boot();
+    try {
+      await booting;
+    } catch {
+      dialog.querySelector('.doom-loading')!.textContent = '✕';
+      return;
+    }
+    if (!running && dialog.open) {
+      running = true;
+      requestAnimationFrame(frame);
+    }
+  }
+  function close() {
+    running = false; // pausa o loop; o jogo continua de onde parou se abrir de novo
+    dialog.close();
+  }
+
+  document.querySelectorAll('[data-doom-open]').forEach((b) => b.addEventListener('click', open));
+  dialog.querySelector('[data-doom-close]')!.addEventListener('click', close);
+  // Esc vai pro jogo (menu do DOOM); fechar é pelo botão
+  dialog.addEventListener('cancel', (e) => e.preventDefault());
+  dialog.addEventListener('close', () => (running = false));
+
+  const key = (pressed: boolean) => (e: KeyboardEvent) => {
+    if (!dialog.open || !doom) return;
+    const k = toDoom(e);
+    if (k === undefined) return;
+    e.preventDefault();
+    if (pressed && e.repeat) return;
+    doom._DG_PushKeyEvent(pressed ? 1 : 0, k);
+  };
+  addEventListener('keydown', key(true));
+  addEventListener('keyup', key(false));
+
+  // controle de toque: segurar = tecla apertada; soltar/sair/cancelar = solta
+  dialog.querySelectorAll<HTMLButtonElement>('.pad [data-key]').forEach((b) => {
+    const k = Number(b.dataset.key);
+    const press = (on: boolean) => (e: PointerEvent) => {
+      e.preventDefault();
+      if (!doom || b.classList.contains('is-down') === on) return;
+      b.classList.toggle('is-down', on);
+      doom._DG_PushKeyEvent(on ? 1 : 0, k);
+    };
+    b.addEventListener('pointerdown', (e) => {
+      b.setPointerCapture(e.pointerId);
+      press(true)(e);
+    });
+    b.addEventListener('pointerup', press(false));
+    b.addEventListener('pointercancel', press(false));
+    b.addEventListener('contextmenu', (e) => e.preventDefault());
+  });
+</script>

@@ -71,6 +71,16 @@ export const pt = {
     badge: 'Ciência da Computação · 8º período · ',
     caption: 'ottaviorr, em algum show',
     offTitle: 'Um pouco de mim',
+    doom: {
+      play: 'Jogar DOOM',
+      title: 'DOOM (shareware, 1993)',
+      close: 'Fechar',
+      loading: 'Carregando o inferno…',
+      hint: 'Setas/WASD andam · Ctrl ou F atira · Espaço abre portas · Enter confirma · Shift corre',
+      start: 'Start',
+      fire: 'Atirar',
+      use: 'Usar',
+    },
     off: [
       { name: 'Código & Design', text: 'Unindo a lógica da programação com a estética visual para criar experiências digitais que são tão funcionais quanto envolventes.' },
       { name: 'Imersão Geek & Gaming', text: 'Apaixonado por narrativas interativas e explorar novos universos — com um lugar de honra sempre reservado no coração (e no setup) para as histórias de Life is Strange.' },

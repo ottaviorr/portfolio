@@ -71,6 +71,16 @@ export const en: Dict = {
     badge: 'Computer Science · 8th semester · ',
     caption: 'ottaviorr, at some show',
     offTitle: 'A bit about me',
+    doom: {
+      play: 'Play DOOM',
+      title: 'DOOM (shareware, 1993)',
+      close: 'Close',
+      loading: 'Loading hell…',
+      hint: 'Arrows/WASD move · Ctrl or F fire · Space opens doors · Enter confirms · Shift runs',
+      start: 'Start',
+      fire: 'Fire',
+      use: 'Use',
+    },
     off: [
       { name: 'Code & Design', text: 'Bringing programming logic and visual craft together to build digital experiences that are as functional as they are engaging.' },
       { name: 'Geek & Gaming', text: 'Into interactive stories and exploring new worlds, with a place of honor always saved in my heart (and my setup) for Life is Strange.' },
