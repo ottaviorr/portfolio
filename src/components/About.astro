@@ -8,12 +8,47 @@ import { t, type Lang } from '../i18n';
 const { lang } = Astro.props as { lang: Lang };
 const d = t(lang).about;
 
-// ícones (traço, estilo Lucide) na ordem de d.off: código, videogame, ingresso de show
-const icons = [
-  '<path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>',
-  '<line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.98 3.59C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26A4 4 0 0 0 17.32 5z"/>',
-  '<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>',
+// Sprites em pixel art (14×9), na ordem de d.off: código, videogame, notas musicais.
+// "#" = pixel aceso. Mesma linguagem de "quadradinho" do dither do resto do site.
+const sprites = [
+  [
+    '..............',
+    '...#....#.#...',
+    '..#.....#..#..',
+    '.#.....#....#.',
+    '#......#.....#',
+    '.#....#.....#.',
+    '..#...#....#..',
+    '...#.#....#...',
+    '..............',
+  ],
+  [
+    '..............',
+    '..####..####..',
+    '.############.',
+    '###.######.###',
+    '##...####.#.##',
+    '###.######.###',
+    '##############',
+    '####......####',
+    '.##........##.',
+  ],
+  [
+    '....##########',
+    '....##########',
+    '....##......##',
+    '....##......##',
+    '....##......##',
+    '....##......##',
+    '.#####...#####',
+    '######..######',
+    '.####....####.',
+  ],
 ];
+// cada pixel aceso vira um quadrado; xadrez de dois tons dá o efeito de dither
+const pixels = sprites.map((rows) =>
+  rows.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ x, y, alt: (x + y) % 2 === 1 }] : []))),
+);
 const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
 ---
 
@@ -42,7 +77,11 @@ const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
         {
           d.off.map((o, i) => (
             <li data-rise style={`--accent: ${accents[i]}`}>
-              <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons[i]} />
+              <svg class="sprite" viewBox="0 0 14 9" shape-rendering="crispEdges" aria-hidden="true">
+                {pixels[i].map((p) => (
+                  <rect x={p.x} y={p.y} width="1" height="1" class:list={[p.alt && 'alt']} style={`--d:${p.x + p.y}`} />
+                ))}
+              </svg>
               <strong>{o.name}</strong>
               <span>{o.text}</span>
             </li>
@@ -178,50 +217,47 @@ const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
     padding: 0;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-2);
+    gap: var(--space-4);
   }
+  /* sem caixa: sprite em pixel art + texto, separados só por uma linha (menos "card padrão") */
   .off li {
-    position: relative;
-    isolation: isolate; /* marca d'água (z-index: -1) fica dentro do card */
-    overflow: hidden;
     display: grid;
     align-content: start;
-    gap: 0.4rem;
-    padding: var(--space-3) var(--space-3) var(--space-6);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--surface);
-    transition: border-color 300ms;
+    gap: 0.5rem;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--line);
   }
-  .off li:hover {
-    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  .sprite {
+    width: 84px; /* 14 colunas × 6px: escala inteira, quadradinho nítido */
+    height: 54px;
+    margin-bottom: var(--space-1);
   }
-  /* ícone como marca d'água grande, vazando no canto; no hover gira e acende */
-  .off svg {
-    position: absolute;
-    right: -18px;
-    bottom: -18px;
-    z-index: -1;
-    width: 120px;
-    height: 120px;
-    fill: none;
-    stroke: var(--accent);
-    stroke-width: 1.25;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    opacity: 0.16;
-    transition:
-      opacity 400ms,
-      rotate 600ms var(--ease-out),
-      scale 600ms var(--ease-out);
+  .sprite rect {
+    fill: var(--accent);
   }
-  .off li:hover svg {
-    opacity: 0.4;
-    rotate: -10deg;
-    scale: 1.08;
+  .sprite rect.alt {
+    fill: color-mix(in srgb, var(--accent) 55%, var(--white));
+  }
+  /* no hover os pixels se montam em diagonal, um a um */
+  .off li:hover .sprite rect {
+    animation: px-build 420ms steps(2) both;
+    animation-delay: calc(var(--d) * 22ms);
+  }
+  @keyframes px-build {
+    from {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .off li:hover .sprite rect {
+      animation: none;
+    }
   }
   .off strong {
-    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+    color: var(--white);
   }
   .off span {
     color: var(--muted);
