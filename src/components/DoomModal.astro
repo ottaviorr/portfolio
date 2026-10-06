@@ -1,7 +1,7 @@
 ---
 // Easter egg: DOOM (shareware) rodando em WebAssembly (doomgeneric) num <dialog>.
-// Nada é baixado até alguém clicar em [data-doom-open]: ~4.5MB em /public/doom.
-// Desktop: teclado. Celular/toque: tela em cima e controle (d-pad + botões) embaixo.
+// Nada é baixado até alguém clicar em [data-doom-open] (o controle em "Um pouco de mim"): ~4.5MB em /public/doom.
+// Desktop: janela retrô em pixel + teclado e mouse (pointer lock). Toque: vira um Game Boy.
 import { t, type Lang } from '../i18n';
 
 const { lang } = Astro.props as { lang: Lang };
@@ -9,86 +9,142 @@ const d = t(lang).about.doom;
 ---
 
 <dialog class="doom" aria-label={d.title}>
-  <div class="doom-bar">
-    <span class="doom-title">{d.title}</span>
-    <button type="button" class="doom-close" data-doom-close>{d.close} <span aria-hidden="true">✕</span></button>
-  </div>
-
-  <div class="doom-screen">
-    <canvas width="640" height="400"></canvas>
-    <p class="doom-loading">{d.loading}</p>
-  </div>
-
-  <p class="doom-hint meta">{d.hint}</p>
-
-  <!-- controle de toque: data-key = código de tecla do DOOM (doomkeys.h) -->
-  <div class="pad" aria-hidden="true">
-    <div class="dpad">
-      <button type="button" class="up" data-key="173">▲</button>
-      <button type="button" class="left" data-key="172">◀</button>
-      <button type="button" class="right" data-key="174">▶</button>
-      <button type="button" class="down" data-key="175">▼</button>
+  <div class="gb">
+    <div class="win-bar">
+      <span class="win-title"><span class="win-icon" aria-hidden="true"></span>ottaviorr.exe — {d.title}</span>
+      <button type="button" class="win-close" data-doom-close aria-label={d.close}>✕</button>
     </div>
-    <div class="meta-btns">
-      <button type="button" data-key="27">Esc</button>
-      <button type="button" data-key="13">{d.start}</button>
+
+    <div class="bezel">
+      <p class="bezel-label" aria-hidden="true"><span></span>PIXEL MATRIX · NO SOUND<span></span></p>
+      <div class="screen">
+        <canvas width="640" height="400"></canvas>
+        <p class="doom-loading">{d.loading}</p>
+        <div class="scan" aria-hidden="true"></div>
+      </div>
     </div>
-    <div class="ab">
-      <button type="button" class="b" data-key="162">{d.use}</button>
-      <button type="button" class="a" data-key="163">{d.fire}</button>
+
+    <p class="brand" aria-hidden="true">ottaviorr<span>.</span> <i>GAME</i></p>
+    <p class="doom-hint meta">{d.hint}</p>
+
+    <!-- controle de toque (Game Boy): data-key = código de tecla do DOOM (doomkeys.h) -->
+    <div class="pad" aria-hidden="true">
+      <div class="dpad">
+        <button type="button" class="up" data-key="173"></button>
+        <button type="button" class="left" data-key="172"></button>
+        <span class="mid"></span>
+        <button type="button" class="right" data-key="174"></button>
+        <button type="button" class="down" data-key="175"></button>
+      </div>
+      <div class="ab">
+        <button type="button" class="b" data-key="162">B<small>{d.use}</small></button>
+        <button type="button" class="a" data-key="163">A<small>{d.fire}</small></button>
+      </div>
+      <div class="sys">
+        <button type="button" data-key="27"><span></span>Select</button>
+        <button type="button" data-key="13"><span></span>Start</button>
+      </div>
+      <div class="grille"></div>
     </div>
   </div>
 </dialog>
 
 <style is:global>
+  /* ── base / desktop: janela retrô em pixel ───────────────────── */
   .doom {
     margin: auto; /* o reset global zera a margem e tira o <dialog> do centro */
-    width: min(92vw, 900px);
+    width: min(92vw, 880px);
     max-height: 96svh;
-    padding: var(--space-2);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: var(--ink);
+    padding: 12px; /* espaço pra borda e sombra em pixel */
+    border: 0;
+    background: none;
     color: var(--paper);
-    overflow: auto;
+    overflow: visible;
   }
   .doom::backdrop {
-    background: rgb(7 11 20 / 0.85);
-    backdrop-filter: blur(4px);
+    background:
+      radial-gradient(circle, rgb(103 163 217 / 0.18) 1px, transparent 1.5px) 0 0 / 10px 10px,
+      rgb(7 11 20 / 0.9);
   }
-  .doom-bar {
+  .gb {
+    background: var(--ink);
+    /* borda em degraus (4px) + sombra dura rosa: cara de janela de sistema antigo */
+    box-shadow:
+      0 -4px 0 0 var(--blue-light),
+      0 4px 0 0 var(--blue-light),
+      -4px 0 0 0 var(--blue-light),
+      4px 0 0 0 var(--blue-light),
+      10px 10px 0 2px var(--pink);
+  }
+  .win-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-2);
+    gap: var(--space-2);
+    padding: 6px 6px 6px 12px;
+    background: var(--blue);
+    color: var(--paper);
     font-family: var(--font-display);
-    font-weight: 700;
-  }
-  .doom-close {
-    min-height: 44px;
-    padding: 0 1rem;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: none;
-    color: inherit;
-    font: inherit;
+    font-weight: 800;
     font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
-  .doom-close:hover {
-    border-color: var(--pink);
+  .win-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  .doom-screen {
+  .win-icon {
+    width: 12px;
+    height: 12px;
+    background: var(--pink);
+    box-shadow: 4px 4px 0 0 var(--paper) inset;
+  }
+  .win-close {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 800;
+    box-shadow:
+      inset -3px -3px 0 0 rgb(0 0 0 / 0.25),
+      inset 3px 3px 0 0 #fff;
+  }
+  .win-close:hover {
+    background: var(--pink);
+  }
+  .win-close:active {
+    box-shadow: inset 3px 3px 0 0 rgb(0 0 0 / 0.25);
+  }
+  .bezel {
+    padding: 12px;
+  }
+  .bezel-label {
+    display: none;
+  }
+  .screen {
     position: relative;
     aspect-ratio: 16 / 10;
     overflow: hidden;
-    border-radius: 8px;
     background: #000;
+    cursor: crosshair;
   }
-  .doom-screen canvas {
+  .screen canvas {
     display: block;
     width: 100%;
     height: 100%;
     image-rendering: pixelated;
+  }
+  /* linhas de CRT, bem leves */
+  .scan {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.18) 0 1px, transparent 1px 3px);
   }
   .doom-loading {
     position: absolute;
@@ -96,21 +152,32 @@ const d = t(lang).about.doom;
     display: grid;
     place-items: center;
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--pink);
+    animation: doom-blink 1s steps(1) infinite;
   }
   .doom.is-ready .doom-loading {
     display: none;
   }
-  .doom-hint {
-    margin-top: var(--space-2);
-    color: color-mix(in srgb, var(--paper) 60%, transparent);
+  .brand {
+    display: none;
   }
-
-  /* controle de toque: só aparece em telas de toque */
+  .doom-hint {
+    padding: 0 12px 12px;
+    color: color-mix(in srgb, var(--paper) 65%, transparent);
+  }
   .pad {
     display: none;
   }
+  @keyframes doom-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* ── toque: Game Boy ──────────────────────────────────────────── */
   @media (hover: none), (pointer: coarse) {
     .doom {
       width: 100vw;
@@ -118,84 +185,209 @@ const d = t(lang).about.doom;
       height: 100svh;
       max-height: none;
       margin: 0;
-      border: 0;
-      border-radius: 0;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr); /* sem isso o canvas (640px nativo) estoura a tela */
-      grid-template-rows: auto auto 1fr;
+      padding: 12px;
+      overflow: auto;
+      background: var(--bg);
     }
-    .doom:not([open]) {
+    .doom::backdrop {
+      background: var(--bg);
+    }
+    .gb {
+      position: relative;
+      max-width: 420px;
+      min-height: calc(100svh - 24px);
+      margin: 0 auto;
+      padding: 14px 16px 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+      gap: 14px;
+      background: color-mix(in srgb, var(--ice) 55%, var(--paper));
+      color: var(--ink);
+      border-radius: 14px 14px 72px 14px; /* o canto inferior direito arredondado do Game Boy */
+      box-shadow:
+        inset -4px -4px 0 0 rgb(0 0 0 / 0.12),
+        inset 4px 4px 0 0 rgb(255 255 255 / 0.6);
+    }
+    .win-bar {
+      padding: 0;
+      background: none;
+      color: color-mix(in srgb, var(--ink) 55%, transparent);
+      font-size: 0.6875rem;
+    }
+    .win-icon {
       display: none;
+    }
+    .win-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--paper);
+      box-shadow: none;
+    }
+    .bezel {
+      padding: 10px 22px 22px;
+      background: #3d4256;
+      border-radius: 10px 10px 40px 10px;
+    }
+    .bezel-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: #c9ccd8;
+      font-size: 0.5625rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+    /* as duas faixas coloridas do Game Boy, nas cores do site */
+    .bezel-label span {
+      flex: 1;
+      height: 6px;
+      background: linear-gradient(var(--pink) 0 3px, var(--blue-light) 3px 6px);
+    }
+    .screen {
+      border-radius: 2px;
+      box-shadow: 0 0 0 3px #22252f;
     }
     .doom-hint {
       display: none;
     }
+    .brand {
+      display: block;
+      margin-top: -4px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.375rem;
+      letter-spacing: -0.04em;
+      color: var(--blue);
+    }
+    .brand span {
+      color: var(--pink);
+    }
+    .brand i {
+      font-size: 0.875rem;
+      letter-spacing: 0.08em;
+      color: color-mix(in srgb, var(--ink) 55%, transparent);
+    }
+
     .pad {
       display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-columns: auto 1fr;
+      grid-template-areas:
+        'dpad ab'
+        'sys sys'
+        '. grille';
       align-items: center;
-      gap: var(--space-2);
-      padding: var(--space-3) var(--space-1);
+      row-gap: 18px;
+      padding-top: 8px;
       user-select: none;
       -webkit-user-select: none;
       touch-action: none;
     }
     .pad button {
       border: 0;
-      background: var(--surface);
-      color: var(--paper);
+      padding: 0;
       font: inherit;
-      font-weight: 700;
       touch-action: none;
       -webkit-tap-highlight-color: transparent;
     }
-    .pad button.is-down {
+    /* direcional em cruz */
+    .dpad {
+      grid-area: dpad;
+      display: grid;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(3, 44px);
+      filter: drop-shadow(0 3px 0 rgb(0 0 0 / 0.25));
+    }
+    .dpad button,
+    .dpad .mid {
+      background: var(--ink);
+    }
+    .dpad .up { grid-area: 1 / 2; border-radius: 6px 6px 0 0; }
+    .dpad .left { grid-area: 2 / 1; border-radius: 6px 0 0 6px; }
+    .dpad .mid { grid-area: 2 / 2; }
+    .dpad .right { grid-area: 2 / 3; border-radius: 0 6px 6px 0; }
+    .dpad .down { grid-area: 3 / 2; border-radius: 0 0 6px 6px; }
+    .dpad button.is-down {
       background: var(--blue);
     }
-    .dpad {
-      display: grid;
-      grid-template-columns: repeat(3, 48px);
-      grid-template-rows: repeat(3, 48px);
-    }
-    .dpad button {
-      border-radius: 8px;
-      font-size: 1.1rem;
-    }
-    .dpad .up { grid-area: 1 / 2; }
-    .dpad .left { grid-area: 2 / 1; }
-    .dpad .right { grid-area: 2 / 3; }
-    .dpad .down { grid-area: 3 / 2; }
-    .meta-btns {
-      justify-self: center;
-      display: grid;
-      gap: var(--space-1);
-    }
-    .meta-btns button {
-      min-height: 36px;
-      padding: 0 0.8rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
-    }
+    /* A e B inclinados, como no original */
     .ab {
+      grid-area: ab;
       justify-self: end;
-      display: grid;
-      grid-template-columns: repeat(2, 58px);
-      gap: var(--space-1);
-      align-items: end;
+      display: flex;
+      gap: 18px;
+      rotate: -25deg;
+      margin-right: 6px;
     }
     .ab button {
+      display: grid;
+      place-items: center;
       width: 58px;
       height: 58px;
       border-radius: 50%;
-      font-size: 0.75rem;
-    }
-    .ab .a {
       background: var(--pink);
       color: var(--ink);
-      margin-bottom: 28px; /* A mais alto, como num controle de verdade */
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.125rem;
+      line-height: 1;
+      box-shadow: 0 3px 0 0 rgb(0 0 0 / 0.25);
     }
-    .ab .a.is-down {
+    .ab .a {
+      translate: 0 -14px;
+    }
+    .ab small {
+      display: block;
+      font-size: 0.5625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .ab button.is-down {
       background: var(--pink-light);
+      box-shadow: none;
+    }
+    /* Select / Start em pílula inclinada */
+    .sys {
+      grid-area: sys;
+      justify-self: center;
+      display: flex;
+      gap: 22px;
+    }
+    .sys button {
+      display: grid;
+      justify-items: center;
+      gap: 6px;
+      background: none;
+      color: color-mix(in srgb, var(--ink) 60%, transparent);
+      font-size: 0.625rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .sys span {
+      width: 44px;
+      height: 12px;
+      border-radius: 999px;
+      background: #7d8396;
+      rotate: -25deg;
+    }
+    .sys button.is-down span {
+      background: var(--blue);
+    }
+    /* grade do alto-falante */
+    .grille {
+      grid-area: grille;
+      justify-self: end;
+      width: 70px;
+      height: 44px;
+      margin-right: 8px;
+      rotate: -25deg;
+      background: repeating-linear-gradient(to right, rgb(0 0 0 / 0.22) 0 4px, transparent 4px 10px);
+      border-radius: 4px;
     }
   }
 </style>
@@ -223,14 +415,17 @@ const d = t(lang).about.doom;
   let booting: Promise<void> | null = null;
   let running = false;
 
+  const K = { LEFT: 0xac, UP: 0xad, RIGHT: 0xae, DOWN: 0xaf, STRAFE_L: 0xa0, STRAFE_R: 0xa1, USE: 0xa2, FIRE: 0xa3 };
+  const push = (on: boolean, key: number) => doom?._DG_PushKeyEvent(on ? 1 : 0, key);
+
   // teclado → códigos do doomkeys.h
   const KEYS: Record<string, number> = {
-    ArrowUp: 0xad, KeyW: 0xad,
-    ArrowDown: 0xaf, KeyS: 0xaf,
-    ArrowLeft: 0xac, ArrowRight: 0xae,
-    KeyA: 0xa0, KeyD: 0xa1, // strafe
-    Space: 0xa2, KeyE: 0xa2, // usar
-    ControlLeft: 0xa3, ControlRight: 0xa3, KeyF: 0xa3, // atirar
+    ArrowUp: K.UP, KeyW: K.UP,
+    ArrowDown: K.DOWN, KeyS: K.DOWN,
+    ArrowLeft: K.LEFT, ArrowRight: K.RIGHT,
+    KeyA: K.STRAFE_L, KeyD: K.STRAFE_R,
+    Space: K.USE, KeyE: K.USE,
+    ControlLeft: K.FIRE, ControlRight: K.FIRE, KeyF: K.FIRE,
     ShiftLeft: 0x80 + 0x36, ShiftRight: 0x80 + 0x36, // correr
     Enter: 13, Escape: 27, Tab: 9, Backspace: 127,
   };
@@ -279,10 +474,54 @@ const d = t(lang).about.doom;
     dialog.classList.add('is-ready');
   }
 
+  // ── mouse ──────────────────────────────────────────────────────
+  // O doomgeneric só recebe teclas, então o mouse vira "segurar ←/→" proporcional ao movimento:
+  // movementX enche um saldo de pixels e cada quadro consome um pedaço enquanto a tecla fica apertada.
+  // ponytail: giro em velocidade de tecla; giro analógico exigiria exportar D_PostEvent no wasm.
+  const PX_PER_FRAME = 10;
+  let turnBudget = 0;
+  let turnHeld = 0; // tecla de giro que o mouse está segurando (0 = nenhuma)
+  function mouseTurn() {
+    const want = Math.abs(turnBudget) > 2 ? (turnBudget > 0 ? K.RIGHT : K.LEFT) : 0;
+    if (want !== turnHeld) {
+      if (turnHeld) push(false, turnHeld);
+      if (want) push(true, want);
+      turnHeld = want;
+    }
+    if (want) turnBudget -= Math.sign(turnBudget) * Math.min(Math.abs(turnBudget), PX_PER_FRAME);
+  }
+  const locked = () => document.pointerLockElement === canvas;
+  canvas.addEventListener('click', () => {
+    if (!locked() && matchMedia('(pointer: fine)').matches) canvas.requestPointerLock();
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (locked()) turnBudget = Math.max(-400, Math.min(400, turnBudget + e.movementX));
+  });
+  canvas.addEventListener('mousedown', (e) => {
+    if (!locked()) return;
+    e.preventDefault();
+    push(true, e.button === 2 ? K.USE : K.FIRE);
+  });
+  canvas.addEventListener('mouseup', (e) => {
+    if (locked()) push(false, e.button === 2 ? K.USE : K.FIRE);
+  });
+  canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+  document.addEventListener('pointerlockchange', () => {
+    if (locked()) return;
+    // saiu do modo mouse: solta tudo que o mouse segurava
+    turnBudget = 0;
+    if (turnHeld) push(false, turnHeld);
+    turnHeld = 0;
+    push(false, K.FIRE);
+    push(false, K.USE);
+  });
+
+  // ── loop ───────────────────────────────────────────────────────
   const image = ctx.createImageData(W, H);
   const out = new Uint32Array(image.data.buffer);
   function frame() {
     if (!running || !doom) return;
+    mouseTurn();
     doom._doomgeneric_Tick();
     // framebuffer ARGB (32 bits) → ImageData RGBA: troca R e B
     const src = new Uint32Array(doom.HEAPU8.buffer, doom._DG_GetFrameBuffer(), W * H);
@@ -310,12 +549,13 @@ const d = t(lang).about.doom;
   }
   function close() {
     running = false; // pausa o loop; o jogo continua de onde parou se abrir de novo
+    if (locked()) document.exitPointerLock();
     dialog.close();
   }
 
   document.querySelectorAll('[data-doom-open]').forEach((b) => b.addEventListener('click', open));
   dialog.querySelector('[data-doom-close]')!.addEventListener('click', close);
-  // Esc vai pro jogo (menu do DOOM); fechar é pelo botão
+  // Esc vai pro jogo (menu do DOOM); fechar é pelo botão ✕
   dialog.addEventListener('cancel', (e) => e.preventDefault());
   dialog.addEventListener('close', () => (running = false));
 
@@ -325,19 +565,19 @@ const d = t(lang).about.doom;
     if (k === undefined) return;
     e.preventDefault();
     if (pressed && e.repeat) return;
-    doom._DG_PushKeyEvent(pressed ? 1 : 0, k);
+    push(pressed, k);
   };
   addEventListener('keydown', key(true));
   addEventListener('keyup', key(false));
 
-  // controle de toque: segurar = tecla apertada; soltar/sair/cancelar = solta
+  // controle de toque: segurar = tecla apertada; soltar/cancelar = solta
   dialog.querySelectorAll<HTMLButtonElement>('.pad [data-key]').forEach((b) => {
     const k = Number(b.dataset.key);
     const press = (on: boolean) => (e: PointerEvent) => {
       e.preventDefault();
       if (!doom || b.classList.contains('is-down') === on) return;
       b.classList.toggle('is-down', on);
-      doom._DG_PushKeyEvent(on ? 1 : 0, k);
+      push(on, k);
     };
     b.addEventListener('pointerdown', (e) => {
       b.setPointerCapture(e.pointerId);

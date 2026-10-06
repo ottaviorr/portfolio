@@ -99,19 +99,28 @@ const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
           {
             d.off.map((o, i) => (
               <div class="off-panel" role="tabpanel" id={`off-panel-${i}`} aria-labelledby={`off-tab-${i}`} style={`--accent: ${accents[i]}`}>
-                <svg class="sprite" viewBox="0 0 14 9" shape-rendering="crispEdges" aria-hidden="true">
-                  {pixels[i].map((p) => (
-                    <rect x={p.x} y={p.y} width="1" height="1" class:list={[p.alt && 'alt']} style={`--d:${p.x + p.y}`} />
-                  ))}
-                </svg>
+                {
+                  // o controle (item de games) é o easter egg: clicar abre o DOOM
+                  i === 1 ? (
+                    <button type="button" class="egg" data-doom-open data-cursor="button" aria-label={d.doom.play}>
+                      <span class="egg-bubble" aria-hidden="true">PRESS START</span>
+                      <svg class="sprite" viewBox="0 0 14 9" shape-rendering="crispEdges" aria-hidden="true">
+                        {pixels[i].map((p) => (
+                          <rect x={p.x} y={p.y} width="1" height="1" class:list={[p.alt && 'alt']} style={`--d:${p.x + p.y}`} />
+                        ))}
+                      </svg>
+                    </button>
+                  ) : (
+                    <svg class="sprite" viewBox="0 0 14 9" shape-rendering="crispEdges" aria-hidden="true">
+                      {pixels[i].map((p) => (
+                        <rect x={p.x} y={p.y} width="1" height="1" class:list={[p.alt && 'alt']} style={`--d:${p.x + p.y}`} />
+                      ))}
+                    </svg>
+                  )
+                }
                 <p class="off-count meta" aria-hidden="true">0{i + 1} / 0{d.off.length}</p>
                 <strong>{o.name}</strong>
                 <p class="off-text">{o.text}</p>
-                {i === 1 && (
-                  <button type="button" class="play" data-doom-open data-cursor="button">
-                    <span aria-hidden="true">▶</span> {d.doom.play}
-                  </button>
-                )}
               </div>
             ))
           }
@@ -388,29 +397,98 @@ const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
     font-size: 1.375rem;
     letter-spacing: -0.03em;
   }
-  .play {
+  /* easter egg: o controle chama o clique — balão em pixel piscando + balanço de tempos em tempos */
+  .egg {
+    position: relative;
     justify-self: start;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-height: 44px;
-    margin-top: var(--space-2);
-    padding: 0 1.1rem;
-    border: 2px solid var(--accent);
-    border-radius: 4px; /* quadradinho: botão de arcade, não pílula */
+    margin-top: var(--space-6); /* espaço pro balão */
+    padding: 0;
+    border: 0;
     background: none;
-    color: var(--accent);
-    font: inherit;
-    font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    font-size: 0.8125rem;
-    transition: background-color 200ms, color 200ms;
+    animation: egg-wiggle 3.2s steps(1) infinite;
   }
-  .play:hover {
+  .egg .sprite {
+    display: block;
+    margin-bottom: var(--space-2);
+    transition: scale 200ms steps(2);
+  }
+  .egg:hover .sprite,
+  .egg:focus-visible .sprite {
+    scale: 1.1;
+  }
+  .egg:hover {
+    animation: none;
+  }
+  .egg-bubble {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% - 4px);
+    translate: -50% 0;
+    padding: 4px 8px;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    white-space: nowrap;
+    animation: egg-blink 1s steps(1) infinite;
+  }
+  /* rabinho do balão em 2 pixels (degrau), não triângulo liso */
+  .egg-bubble::before,
+  .egg-bubble::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+  }
+  .egg-bubble::before {
+    top: calc(100% + 2px);
+    translate: -50% 0;
+  }
+  .egg-bubble::after {
+    top: calc(100% + 8px);
+    translate: -150% 0;
+    width: 4px;
+    height: 4px;
+  }
+  .egg:hover .egg-bubble,
+  .egg:focus-visible .egg-bubble {
+    animation: none;
     background: var(--accent);
     color: var(--ink);
+  }
+  @keyframes egg-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  @keyframes egg-wiggle {
+    0%, 76%, 100% {
+      rotate: 0deg;
+    }
+    80% {
+      rotate: -6deg;
+    }
+    84% {
+      rotate: 6deg;
+    }
+    88% {
+      rotate: -4deg;
+    }
+    92% {
+      rotate: 3deg;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .egg,
+    .egg-bubble {
+      animation: none;
+    }
   }
   .off-text {
     max-width: 44ch;
