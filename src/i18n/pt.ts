@@ -59,7 +59,7 @@ export const pt = {
       { name: 'Sites e landing pages', text: 'Um site que explica o que você faz em cinco segundos e abre antes do cliente desistir.', tags: ['Design responsivo', 'Copy', 'Publicação'] },
       { name: 'UX/UI', text: 'Interface pensada pra quem vai usar, não pra ganhar prêmio. (Se ganhar, melhor.)', tags: ['Pesquisa', 'Wireframes', 'Protótipo no Figma'] },
       { name: 'SEO e performance', text: 'Seu cliente procura no Google. Eu faço você aparecer, e o site abrir rápido quando ele clicar.', tags: ['SEO técnico', 'Core Web Vitals', 'Analytics'] },
-      { name: 'Automações com GoHighLevel', text: 'Formulário, agenda, WhatsApp e follow-up conversando sozinhos. Nada de copiar e colar lead.', tags: ['Formulários', 'Agenda', 'Follow-up'] },
+      { name: 'Automações e integrações', text: 'Formulário, agenda, WhatsApp e follow-up conversando sozinhos. Nada de copiar e colar lead.', tags: ['Formulários', 'Agenda', 'Follow-up'] },
     ],
   },
 

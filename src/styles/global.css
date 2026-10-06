@@ -162,7 +162,7 @@ html.has-cursor * {
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     [data-rise] {
-      animation: rise linear both;
+      animation: rise cubic-bezier(0.22, 1, 0.36, 1) both; /* desacelera no fim: menos mecânico que linear */
       animation-timeline: view();
       animation-range: entry 0% entry 100%;
     }

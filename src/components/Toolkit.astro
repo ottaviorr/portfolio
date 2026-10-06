@@ -21,13 +21,9 @@ const tools = [
     {
       tools.map((tool) => (
         <li class="tile" data-rise style={`--accent: ${tool.accent}`}>
-          {tool.icon ? (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d={tool.icon.path} />
-            </svg>
-          ) : (
-            <span class="mono" aria-hidden="true">{tool.mono}</span>
-          )}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d={tool.icon.path} />
+          </svg>
           <span class="name">{tool.name}</span>
           <span class="group meta">{tool.group}</span>
         </li>
@@ -71,30 +67,18 @@ const tools = [
   .tile:hover {
     border-color: color-mix(in srgb, var(--accent) 55%, transparent);
   }
-  svg,
-  .mono {
+  svg {
     width: 40px;
     height: 40px;
     fill: var(--white);
-    color: var(--white);
-    transition:
-      fill 300ms,
-      color 300ms;
-  }
-  .mono {
-    display: grid;
-    place-items: center;
-    border: 2px solid currentColor;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    transition: fill 300ms;
   }
   .tile:hover svg {
     fill: var(--accent);
   }
-  .tile:hover .mono {
-    color: var(--accent);
+  /* 7 ferramentas: a primeira (design) ocupa 2 colunas e a grade fecha em 4×2 */
+  .tile:first-child {
+    grid-column: span 2;
   }
   .name {
     font-family: var(--font-display);

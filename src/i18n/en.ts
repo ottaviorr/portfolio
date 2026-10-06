@@ -59,7 +59,7 @@ export const en: Dict = {
       { name: 'Websites & landing pages', text: 'A site that explains what you do in five seconds and loads before people give up.', tags: ['Responsive design', 'Copy', 'Launch'] },
       { name: 'UX/UI', text: 'Interfaces made for the people using them, not for awards. (Awards are welcome, though.)', tags: ['Research', 'Wireframes', 'Figma prototype'] },
       { name: 'SEO & performance', text: 'Your customers search on Google. I help you show up, and load fast when they click.', tags: ['Technical SEO', 'Core Web Vitals', 'Analytics'] },
-      { name: 'GoHighLevel automations', text: 'Forms, calendar, WhatsApp and follow-ups talking to each other. No more copy-pasting leads.', tags: ['Forms', 'Calendar', 'Follow-up'] },
+      { name: 'Automations & integrations', text: 'Forms, calendar, WhatsApp and follow-ups talking to each other. No more copy-pasting leads.', tags: ['Forms', 'Calendar', 'Follow-up'] },
     ],
   },
 

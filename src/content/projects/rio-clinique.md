@@ -14,7 +14,7 @@ role:
 services:
   pt: [Site institucional, UX/UI, SEO, Agendamento online]
   en: [Business website, UX/UI, SEO, Online booking]
-stack: [Astro, GoHighLevel, Hostinger]
+stack: [Astro, Hostinger]
 cover: ../../assets/projects/rio-clinique/cover.png
 gallery:
   - src: ../../assets/projects/rio-clinique/desktop-1.png
@@ -39,6 +39,6 @@ challenge:
   pt: A clínica atende o público de Québec e a comunidade brasileira da cidade, então o site precisava funcionar em francês, inglês e português e levar a pessoa até o agendamento sem atrito.
   en: The clinic serves both Québec locals and the city's Brazilian community, so the site had to work in French, English and Portuguese, and get people to a booking without friction.
 work:
-  pt: Design e desenvolvimento do site, das páginas de tratamentos à troca de idioma, com o agendamento do GoHighLevel integrado nas páginas.
-  en: Designed and built the site, from the treatment pages to the language switcher, with GoHighLevel booking embedded across pages.
+  pt: Design e desenvolvimento do site, das páginas de tratamentos à troca de idioma, com o agendamento online integrado nas páginas.
+  en: Designed and built the site, from the treatment pages to the language switcher, with online booking built into every page.
 ---

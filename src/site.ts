@@ -11,8 +11,8 @@ export const site = {
   },
 };
 
-// Toolkit: `icon` vem do simple-icons; sem ícone oficial, usa `mono` (monograma).
-type Tool = { name: string; icon?: { path: string }; mono?: string };
+// Toolkit: ícones do simple-icons. O 1º item de design ocupa 2 colunas (grade fecha em 4×2).
+type Tool = { name: string; icon: { path: string } };
 export const toolkit: { design: Tool[]; code: Tool[] } = {
   design: [
     { name: 'Figma', icon: siFigma },
@@ -24,7 +24,6 @@ export const toolkit: { design: Tool[]; code: Tool[] } = {
     { name: 'Supabase', icon: siSupabase },
     { name: 'Vercel', icon: siVercel },
     { name: 'Hostinger', icon: siHostinger },
-    { name: 'GoHighLevel', mono: 'GHL' },
   ],
 };
 
