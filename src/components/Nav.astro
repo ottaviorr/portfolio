@@ -53,7 +53,7 @@ const other = altPath(Astro.url.pathname, lang);
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--gutter);
+    padding: var(--space-1) var(--gutter);
     font-size: 0.875rem;
     font-weight: 500;
     background: linear-gradient(var(--bg) 30%, transparent);
@@ -74,6 +74,14 @@ const other = altPath(Astro.url.pathname, lang);
     padding: 0;
   }
   nav a,
+  .lang a,
+  .lang [aria-current] {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 0.25rem;
+  }
+  nav a,
   .lang a {
     color: var(--muted);
     transition: color 200ms;
@@ -91,8 +99,8 @@ const other = altPath(Astro.url.pathname, lang);
   .theme {
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     border: 0;
     background: none;
@@ -110,6 +118,7 @@ const other = altPath(Astro.url.pathname, lang);
     height: 18px;
   }
   .lang {
+    align-items: center;
     display: flex;
     gap: 0.35rem;
     color: var(--muted);
@@ -125,7 +134,13 @@ const other = altPath(Astro.url.pathname, lang);
     }
     nav ul {
       justify-content: center;
-      gap: var(--space-2);
+      gap: 0.5rem;
+    }
+    .tools {
+      gap: 0;
+    }
+    .theme {
+      width: 40px;
     }
   }
 </style>

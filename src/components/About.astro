@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import ColorTitle from './ColorTitle.astro';
-import photo from '../assets/otavio.jpg';
+import photo from '../assets/otavio-crop.jpg'; // recorte quadrado de otavio.jpg
 import { t, type Lang } from '../i18n';
 
 const { lang } = Astro.props as { lang: Lang };
@@ -13,7 +13,7 @@ const d = t(lang).about;
 
   <div class="about-grid">
     <figure class="photo">
-      <Image src={photo} alt={d.photoAlt} widths={[360, 560, 800]} sizes="(max-width: 760px) 100vw, 34vw" />
+      <Image src={photo} alt={d.photoAlt} widths={[320, 480, 720]} sizes="(max-width: 760px) 70vw, 320px" />
     </figure>
     <div>
       <p class="about-text" set:html={d.text} />
@@ -35,21 +35,21 @@ const d = t(lang).about;
 <style>
   .about-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
     gap: var(--space-8);
     align-items: start;
     margin-top: var(--space-8);
   }
   .photo img {
     width: 100%;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 1;
     object-fit: cover;
-    object-position: 50% 20%;
     border-radius: 4px;
   }
   .about-text {
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 2.6vw, 2.5rem);
+    font-size: clamp(1.25rem, 1.8vw, 1.875rem);
+    max-width: 34ch;
     font-weight: 600;
     line-height: 1.25;
     letter-spacing: -0.02em;
@@ -107,6 +107,9 @@ const d = t(lang).about;
     }
     .about-grid {
       gap: var(--space-4);
+    }
+    .photo {
+      max-width: 70%;
     }
   }
 </style>

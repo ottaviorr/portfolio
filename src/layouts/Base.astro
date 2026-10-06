@@ -81,7 +81,7 @@ const person = {
     <script>
       import Lenis from 'lenis';
       if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
-        new Lenis({ autoRaf: true, anchors: true });
+        new Lenis({ autoRaf: true, anchors: { offset: -80 } });
       }
     </script>
   </body>

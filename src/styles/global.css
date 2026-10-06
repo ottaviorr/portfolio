@@ -10,6 +10,8 @@
 }
 
 html {
+  touch-action: manipulation;
+  scroll-padding-top: 5rem; /* âncoras não ficam atrás do menu fixo */
   transition: background-color 300ms, color 300ms;
   background: var(--bg);
   color: var(--white);
@@ -35,6 +37,10 @@ img {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+button {
+  cursor: pointer;
 }
 
 ::selection {

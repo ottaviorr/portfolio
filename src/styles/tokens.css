@@ -33,7 +33,8 @@
   --space-8: 4rem;
   --space-12: 6rem;
   --space-section: clamp(6rem, 14vw, 12rem);
-  --gutter: clamp(1rem, 4vw, 3rem);
+  /* margem lateral; em telas largas cresce pra centralizar o conteúdo em 1440px */
+  --gutter: max(clamp(1rem, 4vw, 3rem), calc((100vw - 1440px) / 2));
 
   /* motion */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);

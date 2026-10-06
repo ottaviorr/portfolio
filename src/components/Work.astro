@@ -70,7 +70,8 @@ const projects = (await getProjects()).filter((p) => p.data.featured);
     background: none;
     border: 0;
     border-radius: 999px;
-    padding: 0.4rem 0.9rem;
+    min-height: 2.5rem;
+    padding: 0 1rem;
     transition: background-color 200ms, color 200ms;
   }
   .toggle [aria-pressed='true'] {
@@ -230,6 +231,8 @@ const projects = (await getProjects()).filter((p) => p.data.featured);
   try {
     const saved = localStorage.getItem('work-view');
     if (saved === 'list' || saved === 'grid') set(saved);
+    // no toque não há hover pra revelar capa: a grade mostra as imagens direto
+    else if (matchMedia('(hover: none)').matches) set('grid');
   } catch {}
   buttons.forEach((b) =>
     b.addEventListener('click', () => {

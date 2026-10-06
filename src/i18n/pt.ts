@@ -16,6 +16,7 @@ export const pt = {
     tagline: 'Faço sites que dão a pequenos negócios um design à altura do trabalho que eles fazem.',
     available: 'Disponível para projetos freelance',
     location: 'Minas Gerais, Brasil',
+    cta: 'Bora conversar',
   },
 
   path: {

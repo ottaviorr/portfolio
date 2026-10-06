@@ -19,6 +19,7 @@ const d = t(lang).hero;
     <div class="hero-pitch">
       <p class="hero-role meta">{d.role}</p>
       <p class="hero-tagline">{d.tagline}</p>
+      <a class="hero-cta" href="#contato" data-cursor="button">{d.cta} <span aria-hidden="true">→</span></a>
     </div>
     <ul class="hero-meta meta">
       <li><span class="pulse" aria-hidden="true"></span>{d.available}</li>
@@ -110,6 +111,29 @@ const d = t(lang).hero;
     font-size: var(--fs-body-lg);
     line-height: 1.45;
     text-wrap: balance;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    margin-top: var(--space-3);
+    padding: 0 1.4rem;
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--bg);
+    font-weight: 600;
+    transition: background-color 200ms, color 200ms;
+  }
+  .hero-cta:hover {
+    background: var(--pink);
+    color: var(--ink);
+  }
+  .hero-cta span {
+    transition: translate 200ms var(--ease-out);
+  }
+  .hero-cta:hover span {
+    translate: 3px 0;
   }
   .hero-meta {
     list-style: none;

@@ -16,6 +16,7 @@ export const en: Dict = {
     tagline: 'I build websites that give small businesses a design as good as the work they do.',
     available: 'Open for freelance projects',
     location: 'Minas Gerais, Brazil',
+    cta: "Let's talk",
   },
 
   path: {
