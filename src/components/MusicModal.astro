@@ -6,12 +6,36 @@
 // Classes com prefixo "m-": o DoomModal tem estilos globais (.screen etc.) que vazariam pra cá.
 import tracks from '../music.json';
 import { t, type Lang } from '../i18n';
+import cornerA from '../assets/corner-a.png';
+import cornerB from '../assets/corner-b.png';
+
+// nota musical em pixel (7×9) pras que flutuam em volta
+const note = ['..####.', '..#..##', '..#...#', '..#....', '..#....', '###....', '###....', '###....', '.#.....'];
+const notePx = note.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ x, y }] : [])));
 
 const { lang } = Astro.props as { lang: Lang };
 const d = t(lang).about.music;
 ---
 
 <dialog class="mp3" aria-label={d.title}>
+  <!-- moldura em pixel (só decoração): blobs nos cantos, selo girando, notas flutuando, equalizador -->
+  <div class="m-deco" aria-hidden="true">
+    <img class="m-art a" src={cornerA.src} width="240" height="240" alt="" />
+    <img class="m-art b" src={cornerB.src} width="240" height="240" alt="" />
+    <svg class="m-badge" viewBox="0 0 120 120">
+      <defs><path id="m-badge-circle" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0" /></defs>
+      <circle cx="60" cy="60" r="58" />
+      <text><textPath href="#m-badge-circle" textLength="286" lengthAdjust="spacing">NOW PLAYING · OTTAVIORR · </textPath></text>
+      <rect x="52" y="52" width="16" height="16" />
+    </svg>
+    {[0, 1, 2, 3, 4].map((i) => (
+      <svg class={`m-note n${i}`} viewBox="0 0 7 9" shape-rendering="crispEdges">
+        {notePx.map((p) => <rect x={p.x} y={p.y} width="1" height="1" />)}
+      </svg>
+    ))}
+    <div class="m-eq">{Array.from({ length: 14 }, (_, i) => <i style={`--i:${i}`} />)}</div>
+  </div>
+
   <button type="button" class="mp3-close" data-mp3-close aria-label={d.close}>✕</button>
 
   <div class="m-player">
@@ -66,6 +90,7 @@ const d = t(lang).about.music;
 
 <style is:global>
   .mp3 {
+    position: fixed;
     margin: auto;
     padding: 24px 20px 16px;
     border: 0;
@@ -440,6 +465,121 @@ const d = t(lang).about.music;
   }
   html:has(dialog.mp3[open]) .cursor {
     display: none;
+  }
+
+
+  /* ── moldura em pixel em volta do player ── */
+  .m-deco {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .m-player,
+  .mp3-close,
+  .mp3-link,
+  .mp3-err {
+    position: relative;
+    z-index: 1;
+  }
+  .mp3-close {
+    position: absolute;
+    z-index: 2;
+  }
+  .m-art {
+    position: absolute;
+    width: 480px; /* 240 × 2: escala inteira, bloco nítido */
+    height: 480px;
+    max-width: none;
+    image-rendering: pixelated;
+  }
+  .m-art.a {
+    top: -250px;
+    left: -330px;
+  }
+  .m-art.b {
+    right: -330px;
+    bottom: -230px;
+    rotate: 180deg;
+  }
+  .m-badge {
+    position: absolute;
+    top: 60px;
+    left: -86px;
+    width: 96px;
+    height: 96px;
+    animation: m-spin 14s linear infinite;
+    transform-origin: center;
+  }
+  .m-badge circle { fill: var(--pink); }
+  .m-badge rect { fill: var(--ink); }
+  .m-badge text {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    fill: var(--ink);
+  }
+  .mp3.is-playing .m-badge {
+    animation-duration: 5s; /* gira mais rápido tocando, como disco */
+  }
+  @keyframes m-spin {
+    to { transform: rotate(360deg); }
+  }
+  /* notas em pixel flutuando */
+  .m-note {
+    position: absolute;
+    width: 28px;
+    height: 36px;
+    fill: var(--blue-light);
+    opacity: 0.85;
+    animation: m-float 4s steps(8) infinite;
+  }
+  .m-note:nth-of-type(even) { fill: var(--pink); }
+  .m-note.n0 { top: 30px; right: -70px; }
+  .m-note.n1 { top: 220px; right: -110px; width: 21px; height: 27px; animation-delay: -1.2s; }
+  .m-note.n2 { bottom: 160px; left: -120px; animation-delay: -2.1s; }
+  .m-note.n3 { bottom: 40px; left: -60px; width: 21px; height: 27px; animation-delay: -0.6s; }
+  .m-note.n4 { top: 360px; right: -60px; width: 14px; height: 18px; animation-delay: -3s; }
+  @keyframes m-float {
+    0%, 100% { translate: 0 0; rotate: -6deg; }
+    50% { translate: 0 -18px; rotate: 6deg; }
+  }
+  /* equalizador em pixel embaixo do link: dança só quando toca */
+  .m-eq {
+    position: absolute;
+    left: 50%;
+    bottom: -34px;
+    translate: -50% 0;
+    display: flex;
+    align-items: end;
+    gap: 3px;
+    height: 28px;
+  }
+  .m-eq i {
+    width: 6px;
+    height: 6px;
+    background: repeating-linear-gradient(to top, var(--blue-light) 0 4px, transparent 4px 6px);
+  }
+  .m-eq i:nth-child(3n) { background: repeating-linear-gradient(to top, var(--pink) 0 4px, transparent 4px 6px); }
+  .mp3.is-playing .m-eq i {
+    animation: m-eq 0.9s steps(4) infinite alternate;
+    animation-delay: calc(var(--i) * -0.13s);
+  }
+  @keyframes m-eq {
+    0% { height: 6px; }
+    100% { height: 28px; }
+  }
+  @media (max-width: 760px) {
+    .m-art { width: 240px; height: 240px; }
+    .m-art.a { top: -110px; left: -150px; }
+    .m-art.b { right: -150px; bottom: -110px; }
+    .m-badge { top: auto; bottom: 70px; left: -30px; width: 70px; height: 70px; }
+    .m-note.n1, .m-note.n2, .m-note.n4 { display: none; }
+    .m-note.n0 { right: -8px; top: 180px; }
+    .m-note.n3 { left: -10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .m-badge, .m-note, .mp3.is-playing .m-eq i { animation: none; }
   }
 
   /* telas baixas: aparelho menor */
