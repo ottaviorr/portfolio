@@ -21,10 +21,7 @@ const d = t(lang).hero;
       <p class="hero-tagline">{d.tagline}</p>
       <a class="hero-cta" href="#contato" data-cursor="button">{d.cta} <span aria-hidden="true">→</span></a>
     </div>
-    <ul class="hero-meta meta">
-      <li><span class="pulse" aria-hidden="true"></span>{d.available}</li>
-      <li>{d.location}</li>
-    </ul>
+    <p class="hero-meta meta">{d.location}</p>
   </div>
 </section>
 
@@ -135,36 +132,9 @@ const d = t(lang).hero;
   .hero-cta:hover span {
     translate: 3px 0;
   }
-  .hero-meta {
-    list-style: none;
-    padding: 0;
-  }
-  .hero-meta li {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.5rem;
-  }
-  .pulse {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--pink);
-    animation: pulse 2.4s infinite;
-  }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pink) 60%, transparent); }
-    70%, 100% { box-shadow: 0 0 0 8px transparent; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .pulse { animation: none; }
-  }
   @media (max-width: 640px) {
     .hero-name {
       align-self: center;
-    }
-    .hero-meta li {
-      justify-content: flex-start;
     }
   }
 </style>

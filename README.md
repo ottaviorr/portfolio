@@ -1,6 +1,6 @@
 # ottaviorr — portfólio
 
-Astro (estático) + GSAP + Lenis, publicado na Vercel. Português em `/`, inglês em `/en/`.
+Astro (estático) + GSAP + Lenis, pronto para publicar na Vercel. Português em `/`, inglês em `/en/`.
 
 ```sh
 npm install
@@ -40,7 +40,7 @@ Títulos com ponto final (`'Projetos.'`) ganham o ponto colorido automaticamente
    - `order` define a posição na lista.
    - `featured: false` tira o projeto da home, mas mantém a página.
    - `draft: true` deixa o projeto visível só no `npm run dev` (some do build).
-   - Tudo entre `[COLCHETES]` é placeholder. Troque pelo dado real e não deixe número inventado.
+   - `results` é opcional: sem resultado medido, a seção some da página. Não invente número.
 
 A página `/work/<slug>/` (e `/en/work/<slug>/`) é criada sozinha.
 
@@ -58,6 +58,11 @@ Depois de definir o domínio, atualize `site` em `astro.config.mjs` e a linha `S
 - Letras que mudam de cor: `src/components/ColorTitle.astro`. Use `<ColorTitle text="…" />` só em títulos-chave.
 - Cursor: `src/components/Cursor.astro`. `data-cursor="view|link|button|text"` força um estado.
 - Grade de pixels em volta do cursor no hero: `src/components/Hero.astro`.
+- Atributos reutilizáveis (CSS em `src/styles/global.css`, script em `src/layouts/Base.astro`):
+  - `data-spot`: grade de pixels acende em volta do cursor (cor via `--accent`). Hoje só nos cards de serviços.
+  - `data-tilt`: o card inclina em 3D pro lado do cursor, com sombra.
+  - `data-rise`: o elemento sobe ao entrar na tela (CSS nativo de scroll).
+- Nome do hero com letras que pulam: `<ColorTitle play />` (o script compensa o kerning).
 - Trajetória (SplitText + ScrollTrigger): `src/components/Trajectory.astro`.
 - Preloader: `src/components/Preloader.astro`. Para remover, apague a tag `<Preloader />` do `src/layouts/Base.astro`.
 

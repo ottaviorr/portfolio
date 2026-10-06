@@ -20,7 +20,7 @@ const tools = [
   <ul class="tiles">
     {
       tools.map((tool) => (
-        <li class="tile" data-spot data-rise style={`--accent: ${tool.accent}`}>
+        <li class="tile" data-rise style={`--accent: ${tool.accent}`}>
           {tool.icon ? (
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d={tool.icon.path} />
@@ -66,13 +66,10 @@ const tools = [
     border: 1px solid var(--line);
     border-radius: 14px;
     background: var(--surface);
-    transition:
-      border-color 300ms,
-      transform 400ms var(--ease-out);
+    transition: border-color 300ms;
   }
   .tile:hover {
     border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-    transform: translateY(-4px);
   }
   svg,
   .mono {

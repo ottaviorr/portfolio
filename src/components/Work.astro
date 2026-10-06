@@ -10,7 +10,7 @@ const base = lang === 'en' ? '/en/work/' : '/work/';
 const projects = (await getProjects()).filter((p) => p.data.featured);
 ---
 
-<section id="trabalhos" class="section work" data-view="list" aria-labelledby="work-title">
+<section id="trabalhos" class="section work" data-view="list">
   <div class="section-head">
     <ColorTitle as="h2" class="h1" text={d.work.title} />
     <div class="toggle meta" role="group" aria-label={d.work.viewLabel}>
@@ -107,8 +107,8 @@ const projects = (await getProjects()).filter((p) => p.data.featured);
     object-fit: cover;
     object-position: top;
   }
-  .cover {
-    image-rendering: pixelated;
+  [data-view='list'] .shot {
+    display: none; /* lazy + display:none = o navegador nem baixa */
   }
   .shot {
     opacity: 0;

@@ -8,13 +8,13 @@ export const en: Dict = {
     ogImage: '/og-en.png',
   },
   skip: 'Skip to content',
+  newTab: 'opens in a new tab',
   nav: { work: 'Work', about: 'About', contact: 'Contact', langLabel: 'Language', theme: 'Light theme', home: '— Otávio Herdy, home' },
   cursorView: 'View',
 
   hero: {
     role: 'Web designer & developer',
     tagline: 'I build websites that give small businesses a design as good as the work they do.',
-    available: 'Open for freelance projects',
     location: 'Minas Gerais, Brazil',
     cta: "Let's talk",
   },

@@ -8,13 +8,13 @@ export const pt = {
     ogImage: '/og-pt.png',
   },
   skip: 'Pular para o conteúdo',
+  newTab: 'abre em nova aba',
   nav: { work: 'Projetos', about: 'Sobre', contact: 'Contato', langLabel: 'Idioma', theme: 'Tema claro', home: '— Otávio Herdy, início' },
   cursorView: 'Ver',
 
   hero: {
     role: 'Web designer & dev',
     tagline: 'Faço sites que dão a pequenos negócios um design à altura do trabalho que eles fazem.',
-    available: 'Disponível para projetos freelance',
     location: 'Minas Gerais, Brasil',
     cta: 'Bora conversar',
   },

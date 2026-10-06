@@ -184,7 +184,8 @@ html.has-cursor * {
   transform: perspective(1400px) rotateX(calc(var(--py) * -5deg)) rotateY(calc(var(--px) * 7deg));
   transition:
     transform 800ms var(--ease-out),
-    box-shadow 800ms var(--ease-out);
+    box-shadow 800ms var(--ease-out),
+    border-color 300ms;
 }
 [data-tilt]:hover {
   /* levanta um pouco e a sombra cai pro lado oposto ao cursor: é isso que vende a profundidade */

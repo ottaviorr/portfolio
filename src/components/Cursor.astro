@@ -105,12 +105,26 @@ const { label } = Astro.props as { label: string };
     root.hidden = false;
     document.documentElement.classList.add('has-cursor');
 
+    // o loop só roda enquanto o anel ainda está alcançando o ponto (mouse parado = zero CPU)
+    let running = false;
+    const tick = () => {
+      rx += (x - rx) * 0.18;
+      ry += (y - ry) * 0.18;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+      if (Math.abs(x - rx) + Math.abs(y - ry) > 0.1) requestAnimationFrame(tick);
+      else running = false;
+    };
+
     addEventListener('pointermove', (e) => {
       if (e.pointerType !== 'mouse') return;
       x = e.clientX;
       y = e.clientY;
       dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       root.classList.add('is-visible');
+      if (!running) {
+        running = true;
+        requestAnimationFrame(tick);
+      }
     });
     document.addEventListener('pointerleave', () => root.classList.remove('is-visible'));
 
@@ -120,13 +134,5 @@ const { label } = Astro.props as { label: string };
         ? ''
         : el.dataset.cursor ?? (el.matches('[data-ct]') ? 'text' : el.matches('button, label') ? 'button' : 'link');
     });
-
-    const tick = () => {
-      rx += (x - rx) * 0.18;
-      ry += (y - ry) * 0.18;
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
-      requestAnimationFrame(tick);
-    };
-    tick();
   }
 </script>

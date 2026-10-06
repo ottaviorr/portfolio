@@ -20,7 +20,7 @@ const projects = defineCollection({
       summary: l10n,
       challenge: l10n,
       work: l10n,
-      results: l10n,
+      results: l10n.optional(), // sem resultado medido, a seção não aparece
       featured: z.boolean().default(true),
       order: z.number().default(99),
       draft: z.boolean().default(false), // draft: aparece no `npm run dev`, some no build

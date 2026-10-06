@@ -31,7 +31,12 @@ const other = altPath(Astro.url.pathname, lang);
 <script>
   const btn = document.querySelector<HTMLButtonElement>('.theme')!;
   const root = document.documentElement;
-  const sync = () => btn.setAttribute('aria-pressed', String(root.dataset.theme === 'light'));
+  const meta = document.querySelector<HTMLMetaElement>('meta[name=theme-color]')!;
+  const sync = () => {
+    const light = root.dataset.theme === 'light';
+    btn.setAttribute('aria-pressed', String(light));
+    meta.content = light ? '#F5F7FA' : '#070B14'; // barra do navegador no celular acompanha o tema
+  };
   sync();
   btn.addEventListener('click', () => {
     const light = root.dataset.theme !== 'light';
@@ -41,6 +46,24 @@ const other = altPath(Astro.url.pathname, lang);
       localStorage.setItem('theme', light ? 'light' : 'dark');
     } catch {}
     sync();
+  });
+
+  // seção atual fica destacada no menu (só na home, onde as seções existem)
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('nav a[href*="#"]')];
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const link = links.find((a) => a.hash === '#' + e.target.id);
+        if (!link) continue;
+        if (e.isIntersecting) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      }
+    },
+    { rootMargin: '-45% 0px -45% 0px' }, // conta como "atual" a seção que cruza o meio da tela
+  );
+  links.forEach((a) => {
+    const el = document.getElementById(a.hash.slice(1));
+    if (el) io.observe(el);
   });
 </script>
 
@@ -89,6 +112,9 @@ const other = altPath(Astro.url.pathname, lang);
   nav a:hover,
   .lang a:hover {
     color: var(--blue-light);
+  }
+  nav a[aria-current] {
+    color: var(--white);
   }
   .tools {
     justify-self: end;

@@ -1,6 +1,6 @@
 ---
 import ColorTitle from './ColorTitle.astro';
-import { site, isTodo } from '../site';
+import { site } from '../site';
 import { t, type Lang } from '../i18n';
 
 const { lang } = Astro.props as { lang: Lang };
@@ -26,7 +26,7 @@ const links = [
               <li>
                 <a href={l.href} target="_blank" rel="me noopener">
                   {l.name} <span aria-hidden="true">↗</span>
-                  {isTodo(l.href) && <span class="todo">{l.href}</span>}
+                  <span class="sr-only"> ({t(lang).newTab})</span>
                 </a>
               </li>
             ))
@@ -36,8 +36,8 @@ const links = [
     </div>
   </div>
 
-  <a class="marquee" href={`mailto:${site.email}`} aria-label={`${d.marquee}: ${site.email}`}>
-    <span class="track" aria-hidden="true">
+  <a class="marquee" href={`mailto:${site.email}`} tabindex="-1" aria-hidden="true">
+    <span class="track">
       {[...run, ...run].map((s) => <span>{s}<i>✦</i></span>)}
     </span>
   </a>
@@ -122,11 +122,6 @@ const links = [
   }
   .links a:hover {
     color: var(--blue-light);
-  }
-  .todo {
-    margin-left: 0.5em;
-    color: var(--pink);
-    font-size: var(--fs-meta);
   }
   @media (max-width: 760px) {
     .contact-grid {

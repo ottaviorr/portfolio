@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import ColorTitle from '../components/ColorTitle.astro';
+---
+
+<Base lang="pt" title="Página não encontrada — Otávio Herdy">
+  <section class="section nf">
+    <p class="meta">404</p>
+    <ColorTitle as="h1" class="display" text="Ops." />
+    <p class="text">
+      Essa página não existe (ou mudou de lugar).<br />
+      <span lang="en">This page doesn't exist (or it moved).</span>
+    </p>
+    <a class="home" href="/" data-cursor="button">Voltar pro início <span aria-hidden="true">→</span></a>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    min-height: 100svh;
+    display: grid;
+    align-content: center;
+    gap: var(--space-3);
+  }
+  .text {
+    font-size: var(--fs-body-lg);
+    color: var(--muted);
+  }
+  .home {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    padding: 0 1.4rem;
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--bg);
+    font-weight: 600;
+    transition: background-color 200ms;
+  }
+  .home:hover {
+    background: var(--pink);
+    color: var(--ink);
+  }
+</style>

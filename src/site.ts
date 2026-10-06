@@ -28,5 +28,3 @@ export const toolkit: { design: Tool[]; code: Tool[] } = {
   ],
 };
 
-/** Placeholder ainda não preenchido em site.ts? */
-export const isTodo = (v: string) => v.startsWith('[');

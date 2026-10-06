@@ -20,8 +20,8 @@ const facts = [
 const sections = [
   [d.challenge, p.challenge[lang]],
   [d.work, p.work[lang]],
-  [d.results, p.results[lang]],
-];
+  [d.results, p.results?.[lang]],
+].filter(([, v]) => v);
 ---
 
 <Base lang={lang} title={`${p.title} — Otávio Herdy`} description={p.summary[lang]}>
@@ -40,10 +40,15 @@ const sections = [
           ))
         }
       </dl>
-      <a class="visit" href={p.url} target="_blank" rel="noopener" data-cursor="button">{d.visit} <span aria-hidden="true">↗</span></a>
+      <a class="visit" href={p.url} target="_blank" rel="noopener" data-cursor="button">{d.visit} <span aria-hidden="true">↗</span><span class="sr-only"> ({t(lang).newTab})</span></a>
     </header>
 
-    <img class="cover" src={p.cover.src} width={p.cover.width} height={p.cover.height} alt={d.coverAlt} />
+    <div class="cover-wrap">
+      <figure class="cover-frame" data-cursor="view">
+        <img class="cover" src={p.cover.src} width={p.cover.width} height={p.cover.height} alt={d.coverAlt} />
+        <Image class="cover-shot" src={p.gallery[0].src} widths={[800, 1440]} sizes="(max-width: 760px) 100vw, 1100px" alt="" />
+      </figure>
+    </div>
 
     <div class="section body">
       {
@@ -133,12 +138,34 @@ const sections = [
   .visit:hover {
     background: color-mix(in srgb, var(--blue) 80%, var(--bg));
   }
-  .cover {
+  /* capa contida num quadro (antes ia de ponta a ponta e ficava agressiva no desktop);
+     no hover o dither dá lugar ao print real */
+  .cover-wrap {
+    padding: 0 var(--gutter);
+  }
+  .cover-frame {
+    position: relative;
+    max-width: 1100px;
+    margin-inline: auto;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+  .cover-frame img {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    height: 100%;
     object-fit: cover;
     object-position: top;
-    image-rendering: pixelated;
+  }
+  .cover-shot {
+    opacity: 0;
+    transition: opacity 600ms var(--ease-out);
+  }
+  .cover-frame:hover .cover-shot {
+    opacity: 1;
   }
   .body {
     display: grid;

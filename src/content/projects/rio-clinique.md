@@ -1,5 +1,4 @@
 ---
-# Tudo entre [COLCHETES] é placeholder: troque pelo dado real. Não deixe nada inventado.
 title: Rio Clinique
 url: https://rioclinique.ca/
 year: '2026'
@@ -10,12 +9,11 @@ client:
   pt: Clínica de estética e bem-estar · Québec, Canadá
   en: Esthetics & wellness clinic · Québec, Canada
 role:
-  pt: Design & desenvolvimento # confirme
+  pt: Design & desenvolvimento
   en: Design & development
 services:
   pt: [Site institucional, UX/UI, SEO, Agendamento online]
   en: [Business website, UX/UI, SEO, Online booking]
-# detectado no HTML público do site — confira
 stack: [Astro, GoHighLevel, Hostinger]
 cover: ../../assets/projects/rio-clinique/cover.png
 gallery:
@@ -38,12 +36,9 @@ summary:
   pt: Site em três idiomas para uma clínica brasileira de estética em Québec, com agendamento direto pelo site.
   en: A three-language website for a Brazilian esthetics clinic in Québec, with booking built right in.
 challenge:
-  pt: A clínica atende o público de Québec e a comunidade brasileira da cidade, então o site precisava funcionar em francês, inglês e português e levar a pessoa até o agendamento sem atrito. [COMPLETAR — como era antes, o que a cliente pediu]
-  en: The clinic serves both Québec locals and the city's Brazilian community, so the site had to work in French, English and Portuguese, and get people to a booking without friction. [FILL IN — what was there before, what the client asked for]
+  pt: A clínica atende o público de Québec e a comunidade brasileira da cidade, então o site precisava funcionar em francês, inglês e português e levar a pessoa até o agendamento sem atrito.
+  en: The clinic serves both Québec locals and the city's Brazilian community, so the site had to work in French, English and Portuguese, and get people to a booking without friction.
 work:
-  pt: Design e desenvolvimento do site, das páginas de tratamentos à troca de idioma, com o agendamento do GoHighLevel integrado nas páginas. [COMPLETAR]
-  en: Designed and built the site, from the treatment pages to the language switcher, with GoHighLevel booking embedded across pages. [FILL IN]
-results:
-  pt: '[RESULTADO]'
-  en: '[RESULT]'
+  pt: Design e desenvolvimento do site, das páginas de tratamentos à troca de idioma, com o agendamento do GoHighLevel integrado nas páginas.
+  en: Designed and built the site, from the treatment pages to the language switcher, with GoHighLevel booking embedded across pages.
 ---
