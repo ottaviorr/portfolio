@@ -76,7 +76,7 @@ export const pt = {
       title: 'DOOM (shareware, 1993)',
       close: 'Fechar',
       loading: 'Carregando o inferno…',
-      hint: 'Clique na tela pra mirar com o mouse · clique atira · botão direito abre portas · WASD/setas andam · Shift corre · Esc solta o mouse',
+      hint: 'Clique na tela pra mirar com o mouse · clique atira · botão direito abre portas · WASD/setas andam · Shift corre · M abre o menu · Esc fecha',
       start: 'Start',
       fire: 'Atirar',
       use: 'Usar',

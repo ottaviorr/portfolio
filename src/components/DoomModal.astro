@@ -11,7 +11,8 @@ const d = t(lang).about.doom;
 <dialog class="doom" aria-label={d.title}>
   <div class="gb">
     <div class="win-bar">
-      <span class="win-title"><span class="win-icon" aria-hidden="true"></span>ottaviorr.exe — {d.title}</span>
+      <span class="win-title"><span class="win-icon" aria-hidden="true"></span>ottaviorr.exe<span class="win-sub">&nbsp;— {d.title}</span></span>
+      <span class="led" aria-hidden="true"></span>
       <button type="button" class="win-close" data-doom-close aria-label={d.close}>✕</button>
     </div>
 
@@ -19,7 +20,12 @@ const d = t(lang).about.doom;
       <p class="bezel-label" aria-hidden="true"><span></span>PIXEL MATRIX · NO SOUND<span></span></p>
       <div class="screen">
         <canvas width="640" height="400"></canvas>
-        <p class="doom-loading">{d.loading}</p>
+        <div class="boot" aria-hidden="true">
+          <p class="boot-logo">ottaviorr<span>.</span></p>
+          <div class="boot-bar"><i></i></div>
+          <p class="boot-pct">0%</p>
+        </div>
+        <p class="sr-only" aria-live="polite">{d.loading}</p>
         <div class="scan" aria-hidden="true"></div>
       </div>
     </div>
@@ -146,20 +152,115 @@ const d = t(lang).about.doom;
     pointer-events: none;
     background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.18) 0 1px, transparent 1px 3px);
   }
-  .doom-loading {
+  /* boot: o logo desce como o do Game Boy e a barra mostra o download de verdade */
+  .boot {
     position: absolute;
     inset: 0;
     display: grid;
-    place-items: center;
+    place-content: center;
+    justify-items: center;
+    gap: 18px;
+    background: #000;
+  }
+  .doom.is-ready .boot {
+    display: none;
+  }
+  .boot-logo {
     font-family: var(--font-display);
     font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--pink);
-    animation: doom-blink 1s steps(1) infinite;
+    font-size: clamp(1.75rem, 5vw, 3rem);
+    letter-spacing: -0.05em;
+    color: var(--paper);
+    animation: boot-drop 1.1s steps(11) both;
   }
-  .doom.is-ready .doom-loading {
-    display: none;
+  .boot-logo span {
+    color: var(--pink);
+  }
+  @keyframes boot-drop {
+    from {
+      translate: 0 -220%;
+    }
+  }
+  .boot-bar {
+    width: min(60%, 260px);
+    height: 14px;
+    padding: 2px;
+    border: 2px solid var(--blue-light);
+  }
+  .boot-bar i {
+    display: block;
+    width: var(--p, 0%);
+    height: 100%;
+    /* barra em blocos, não lisa */
+    background: repeating-linear-gradient(to right, var(--pink) 0 8px, transparent 8px 10px);
+  }
+  .boot-pct {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: var(--blue-light);
+  }
+
+  /* TV de tubo: liga numa linha que abre, desliga encolhendo pra um ponto */
+  .doom[open] .screen {
+    animation: crt-on 420ms ease-out both;
+  }
+  .doom.is-closing .screen {
+    animation: crt-off 380ms ease-in both;
+  }
+  @keyframes crt-on {
+    0% {
+      transform: scale(1, 0.006);
+      filter: brightness(4);
+    }
+    45% {
+      transform: scale(1, 0.006);
+      filter: brightness(3);
+    }
+    100% {
+      transform: none;
+      filter: none;
+    }
+  }
+  @keyframes crt-off {
+    0% {
+      transform: none;
+      filter: none;
+    }
+    55% {
+      transform: scale(1, 0.006);
+      filter: brightness(4);
+    }
+    100% {
+      transform: scale(0, 0.006);
+      filter: brightness(6);
+    }
+  }
+
+  /* LED de energia: pisca carregando, acende rodando */
+  .led {
+    margin-left: auto;
+    width: 10px;
+    height: 10px;
+    background: #4a1f2e;
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 0.25);
+    animation: doom-blink 0.6s steps(1) infinite;
+  }
+  .doom.is-ready .led {
+    animation: none;
+    background: var(--pink);
+    box-shadow:
+      0 0 0 2px rgb(0 0 0 / 0.25),
+      0 0 10px 2px var(--pink);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .boot-logo,
+    .led,
+    .doom[open] .screen,
+    .doom.is-closing .screen {
+      animation: none;
+    }
   }
   .brand {
     display: none;
@@ -215,8 +316,12 @@ const d = t(lang).about.doom;
       color: color-mix(in srgb, var(--ink) 55%, transparent);
       font-size: 0.6875rem;
     }
-    .win-icon {
+    .win-icon,
+    .win-sub {
       display: none;
+    }
+    .led {
+      margin-right: 8px;
     }
     .win-close {
       width: 32px;
@@ -416,7 +521,19 @@ const d = t(lang).about.doom;
   let running = false;
 
   const K = { LEFT: 0xac, UP: 0xad, RIGHT: 0xae, DOWN: 0xaf, STRAFE_L: 0xa0, STRAFE_R: 0xa1, USE: 0xa2, FIRE: 0xa3 };
-  const push = (on: boolean, key: number) => doom?._DG_PushKeyEvent(on ? 1 : 0, key);
+  // guarda o que está apertado pra soltar tudo ao fechar (senão o boneco volta andando sozinho)
+  const held = new Set<number>();
+  const push = (on: boolean, key: number) => {
+    if (!doom) return;
+    if (on) held.add(key);
+    else held.delete(key);
+    doom._DG_PushKeyEvent(on ? 1 : 0, key);
+  };
+  const releaseAll = () => {
+    held.forEach((k) => doom?._DG_PushKeyEvent(0, k));
+    held.clear();
+    dialog.querySelectorAll('.is-down').forEach((b) => b.classList.remove('is-down'));
+  };
 
   // teclado → códigos do doomkeys.h
   const KEYS: Record<string, number> = {
@@ -427,7 +544,7 @@ const d = t(lang).about.doom;
     Space: K.USE, KeyE: K.USE,
     ControlLeft: K.FIRE, ControlRight: K.FIRE, KeyF: K.FIRE,
     ShiftLeft: 0x80 + 0x36, ShiftRight: 0x80 + 0x36, // correr
-    Enter: 13, Escape: 27, Tab: 9, Backspace: 127,
+    Enter: 13, KeyM: 27, Tab: 9, Backspace: 127, // M abre o menu do DOOM (Esc fecha a janela)
   };
   const toDoom = (e: KeyboardEvent) =>
     KEYS[e.code] ?? (e.key.length === 1 ? e.key.toLowerCase().charCodeAt(0) : undefined); // letras/números (Y/N do menu, armas 1-7)
@@ -442,12 +559,36 @@ const d = t(lang).about.doom;
     });
   }
 
+  // baixa somando os bytes recebidos pra barra de progresso do boot ser real
+  const bar = dialog.querySelector<HTMLElement>('.boot-bar i')!;
+  const pct = dialog.querySelector<HTMLElement>('.boot-pct')!;
+  const TOTAL = 4_600_000; // ~ doom.wasm + doom1.wad (só pra barra; o download não depende disso)
+  let loaded = 0;
+  async function fetchCounted(url: string) {
+    const res = await fetch(url);
+    if (!res.ok || !res.body) throw new Error(url);
+    const reader = res.body.getReader();
+    const chunks: Uint8Array[] = [];
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      loaded += value.length;
+      const p = Math.min(100, Math.round((loaded / TOTAL) * 100));
+      bar.style.setProperty('--p', `${p}%`);
+      pct.textContent = `${p}%`;
+    }
+    return new Blob(chunks).arrayBuffer();
+  }
+
   async function boot() {
     const [wasm, wad] = await Promise.all([
-      fetch('/doom/doom.wasm').then((r) => r.arrayBuffer()),
-      fetch('/doom/doom1.wad').then((r) => r.arrayBuffer()),
+      fetchCounted('/doom/doom.wasm'),
+      fetchCounted('/doom/doom1.wad'),
       loadScript('/doom/doom.js'),
     ]);
+    bar.style.setProperty('--p', '100%');
+    pct.textContent = '100%';
     const create = (window as unknown as { createDoomModule: (m: object) => Promise<Doom> }).createDoomModule;
     doom = await create({
       wasmBinary: wasm,
@@ -471,7 +612,6 @@ const d = t(lang).about.doom;
     const argv = doom._malloc(ptrs.length * 4);
     ptrs.forEach((p, i) => doom!.setValue(argv + i * 4, p, 'i32'));
     doom._doomgeneric_Create(args.length, argv);
-    dialog.classList.add('is-ready');
   }
 
   // ── mouse ──────────────────────────────────────────────────────
@@ -508,6 +648,8 @@ const d = t(lang).about.doom;
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   document.addEventListener('pointerlockchange', () => {
     if (locked()) return;
+    // o navegador às vezes "come" o Esc só pra soltar o mouse: trata como sair também
+    if (dialog.open && !closing) close();
     // saiu do modo mouse: solta tudo que o mouse segurava
     turnBudget = 0;
     if (turnHeld) push(false, turnHeld);
@@ -533,13 +675,18 @@ const d = t(lang).about.doom;
     requestAnimationFrame(frame);
   }
 
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
   async function open() {
+    if (dialog.open) return;
     dialog.showModal();
-    booting ??= boot();
+    if (!booting) {
+      // 1ª vez: o boot fica na tela pelo menos o tempo do logo descer
+      booting = Promise.all([boot(), wait(1400)]).then(() => dialog.classList.add('is-ready'));
+    }
     try {
       await booting;
     } catch {
-      dialog.querySelector('.doom-loading')!.textContent = '✕';
+      pct.textContent = 'ERRO / ERROR';
       return;
     }
     if (!running && dialog.open) {
@@ -547,20 +694,58 @@ const d = t(lang).about.doom;
       requestAnimationFrame(frame);
     }
   }
-  function close() {
+  let closing = false;
+  async function close() {
+    if (!dialog.open || closing) return;
+    closing = true;
     running = false; // pausa o loop; o jogo continua de onde parou se abrir de novo
+    releaseAll();
     if (locked()) document.exitPointerLock();
+    if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      dialog.classList.add('is-closing'); // TV de tubo desligando
+      await wait(380);
+    }
     dialog.close();
+    dialog.classList.remove('is-closing');
+    closing = false;
   }
 
   document.querySelectorAll('[data-doom-open]').forEach((b) => b.addEventListener('click', open));
   dialog.querySelector('[data-doom-close]')!.addEventListener('click', close);
-  // Esc vai pro jogo (menu do DOOM); fechar é pelo botão ✕
-  dialog.addEventListener('cancel', (e) => e.preventDefault());
-  dialog.addEventListener('close', () => (running = false));
+  // Esc = sair de tudo, com um toque só: solta o mouse e fecha (com a animação de TV)
+  dialog.addEventListener('cancel', (e) => {
+    e.preventDefault();
+    close();
+  });
+  // se o navegador fechar sozinho (ex.: Chrome ignora o preventDefault do Esc repetido), limpa igual
+  dialog.addEventListener('close', () => {
+    running = false;
+    releaseAll();
+    if (locked()) document.exitPointerLock();
+  });
+  addEventListener('blur', releaseAll); // trocou de aba/janela segurando tecla
+
+  // código Konami em qualquer lugar do site também abre o DOOM
+  const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  let konami = 0;
+  addEventListener('keydown', (e) => {
+    if (dialog.open) return;
+    konami = e.key.toLowerCase() === KONAMI[konami].toLowerCase() ? konami + 1 : e.key === 'ArrowUp' ? 1 : 0;
+    if (konami === KONAMI.length) {
+      konami = 0;
+      open();
+    }
+  });
 
   const key = (pressed: boolean) => (e: KeyboardEvent) => {
     if (!dialog.open || !doom) return;
+    if (e.key === 'Escape') {
+      if (pressed) {
+        e.preventDefault();
+        close();
+      }
+      return;
+    }
     const k = toDoom(e);
     if (k === undefined) return;
     e.preventDefault();

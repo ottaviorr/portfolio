@@ -76,7 +76,7 @@ export const en: Dict = {
       title: 'DOOM (shareware, 1993)',
       close: 'Close',
       loading: 'Loading hell…',
-      hint: 'Click the screen to aim with the mouse · click fires · right-click opens doors · WASD/arrows move · Shift runs · Esc releases the mouse',
+      hint: 'Click the screen to aim with the mouse · click fires · right-click opens doors · WASD/arrows move · Shift runs · M opens the menu · Esc closes',
       start: 'Start',
       fire: 'Fire',
       use: 'Use',
