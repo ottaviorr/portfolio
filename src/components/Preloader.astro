@@ -1,0 +1,65 @@
+---
+// Abertura curta (~1,4s): as letras do nome entram piscando azul/rosa e assentam em branco.
+// Só na 1ª visita da sessão e nunca com reduced-motion. Sem JS, não aparece.
+const letters = [...'Otávio Herdy'];
+---
+
+<script is:inline>
+  try {
+    if (!sessionStorage.getItem('oh-seen') && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      document.documentElement.classList.add('is-loading');
+      sessionStorage.setItem('oh-seen', '1');
+    }
+  } catch {}
+</script>
+
+<div class="preloader" aria-hidden="true">
+  <p>
+    {letters.map((ch, i) => <span style={`--i:${i}`}>{ch === ' ' ? ' ' : ch}</span>)}
+  </p>
+</div>
+
+<style is:global>
+  .preloader {
+    display: none;
+  }
+  .is-loading .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    background: var(--bg);
+    pointer-events: none;
+    animation: pre-out 500ms var(--ease-out) 1000ms forwards;
+  }
+  .preloader p {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 9vw, 7rem);
+    letter-spacing: -0.05em;
+  }
+  .preloader span {
+    display: inline-block;
+    animation:
+      pre-in 500ms var(--ease-out) calc(var(--i) * 35ms) both,
+      pre-blink 700ms steps(1) calc(var(--i) * 35ms) both;
+  }
+  @keyframes pre-in {
+    from {
+      opacity: 0;
+      translate: 0 40%;
+    }
+  }
+  @keyframes pre-blink {
+    0% { color: var(--blue-light); }
+    35% { color: var(--pink); }
+    70%, 100% { color: var(--white); }
+  }
+  @keyframes pre-out {
+    to {
+      translate: 0 -100%;
+      visibility: hidden;
+    }
+  }
+</style>

@@ -1,0 +1,59 @@
+/* Design tokens — única fonte de cor, tipo, espaço e motion. */
+:root {
+  /* cor */
+  --bg: #070b14;
+  --surface: #0d1b2a;
+  --blue: #0671b7; /* 3.8:1 no bg → só texto grande / gráficos */
+  --blue-light: #67a3d9;
+  --ice: #c8e7f5;
+  --pink: #f8b7cd;
+  --pink-light: #f6d2e0;
+  --white: #f5f7fa;
+  --line: color-mix(in srgb, var(--ice) 14%, transparent);
+  --muted: color-mix(in srgb, var(--ice) 72%, var(--bg)); /* ~9:1 no bg */
+
+  /* tipo */
+  --font-display: 'Inter Tight Variable', 'Inter Tight', system-ui, sans-serif;
+  --font-body: 'Inter Variable', 'Inter', system-ui, sans-serif;
+
+  --fs-display: clamp(4.5rem, min(26vw, 34svh), 20rem);
+  --fs-h1: clamp(3rem, 9vw, 8rem);
+  --fs-h2: clamp(2.25rem, 6vw, 5.5rem);
+  --fs-h3: clamp(1.5rem, 2.5vw, 2.25rem);
+  --fs-body-lg: clamp(1.125rem, 1.5vw, 1.375rem);
+  --fs-body: 1rem;
+  --fs-meta: 0.8125rem;
+
+  /* espaço */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-6: 3rem;
+  --space-8: 4rem;
+  --space-12: 6rem;
+  --space-section: clamp(6rem, 14vw, 12rem);
+  --gutter: clamp(1rem, 4vw, 3rem);
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-in: 220ms;
+  --dur-out: 900ms;
+  --ease-trail: cubic-bezier(0.45, 0, 0.55, 1); /* segura a cor e só então apaga */
+
+  /* fixas: não mudam com o tema (botões sobre azul, arte) */
+  --ink: #070b14;
+  --paper: #f5f7fa;
+}
+
+/* Tema claro: mesmos nomes, valores trocados. `--white` é "cor do texto", `--bg` é "fundo".
+   Azul e rosa escurecem pra manter contraste AA sobre fundo claro. */
+:root[data-theme='light'] {
+  --bg: #f5f7fa;
+  --surface: #e7edf3;
+  --white: #0b1220;
+  --ice: #0d1b2a;
+  --blue-light: #0a5f9e;
+  --pink: #d2457f;
+  --pink-light: #b8336b;
+}

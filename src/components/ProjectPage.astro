@@ -1,0 +1,224 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import ColorTitle from './ColorTitle.astro';
+import { getProjects } from '../projects';
+import { t, type Lang } from '../i18n';
+
+const { lang, id } = Astro.props as { lang: Lang; id: string };
+const d = t(lang).project;
+const all = await getProjects();
+const i = all.findIndex((p) => p.id === id);
+const p = all[i].data;
+const next = all[(i + 1) % all.length];
+const home = lang === 'en' ? '/en/' : '/';
+const facts = [
+  [d.client, p.client[lang]],
+  [d.role, p.role[lang]],
+  [d.year, p.year],
+];
+const sections = [
+  [d.challenge, p.challenge[lang]],
+  [d.work, p.work[lang]],
+  [d.results, p.results[lang]],
+];
+---
+
+<Base lang={lang} title={`${p.title} — Otávio Herdy`} description={p.summary[lang]}>
+  <article class="project">
+    <header class="section head">
+      <a class="back meta" href={`${home}#trabalhos`}>← {d.back}</a>
+      <ColorTitle as="h1" class="h1" text={`${p.title}.`} />
+      <p class="summary">{p.summary[lang]}</p>
+      <dl class="facts">
+        {
+          facts.map(([k, v]) => (
+            <div>
+              <dt class="meta">{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <a class="visit" href={p.url} target="_blank" rel="noopener" data-cursor="button">{d.visit} <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <img class="cover" src={p.cover.src} width={p.cover.width} height={p.cover.height} alt={d.coverAlt} />
+
+    <div class="section body">
+      {
+        sections.map(([k, v]) => (
+          <section class="row">
+            <h2 class="meta">{k}</h2>
+            <p>{v}</p>
+          </section>
+        ))
+      }
+      <section class="row">
+        <h2 class="meta">{d.services} · {d.stack}</h2>
+        <ul class="chips">
+          {p.services[lang].map((s) => <li>{s}</li>)}
+          {p.stack.map((s) => <li class="chip-stack">{s}</li>)}
+        </ul>
+      </section>
+    </div>
+
+    <div class="gallery">
+      {
+        p.gallery.map((g) => (
+          <figure class:list={['shot', g.device]}>
+            <Image
+              src={g.src}
+              alt={g.alt[lang]}
+              widths={g.device === 'mobile' ? [390, 780] : [800, 1440]}
+              sizes={g.device === 'mobile' ? '(max-width: 760px) 70vw, 30vw' : '(max-width: 760px) 100vw, 80vw'}
+            />
+          </figure>
+        ))
+      }
+    </div>
+
+    {
+      all.length > 1 && (
+        <a class="section next" href={`${lang === 'en' ? '/en' : ''}/work/${next.id}/`} data-cursor="view">
+          <span class="meta">{d.next}</span>
+          <span class="h1">{next.data.title}</span>
+        </a>
+      )
+    }
+  </article>
+</Base>
+
+<style>
+  .head {
+    padding-bottom: var(--space-8);
+  }
+  .head {
+    padding-top: var(--space-12);
+  }
+  .back {
+    display: inline-block;
+    margin-bottom: var(--space-4);
+  }
+  .back:hover {
+    color: var(--blue-light);
+  }
+  .summary {
+    max-width: 40ch;
+    margin-top: var(--space-4);
+    font-size: var(--fs-body-lg);
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--line);
+  }
+  dd {
+    margin-top: 0.25rem;
+    font-weight: 500;
+  }
+  .visit {
+    display: inline-block;
+    margin-top: var(--space-6);
+    padding: 0.9rem 1.5rem;
+    border-radius: 999px;
+    background: var(--blue);
+    color: var(--paper);
+    font-weight: 600;
+    transition: background-color 200ms;
+  }
+  .visit:hover {
+    background: color-mix(in srgb, var(--blue) 80%, var(--bg));
+  }
+  .cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: top;
+    image-rendering: pixelated;
+  }
+  .body {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--space-2) var(--space-6);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--line);
+  }
+  .row p {
+    font-size: var(--fs-body-lg);
+    max-width: 52ch;
+  }
+  .chips {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .chips li {
+    padding: 0.35rem 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.875rem;
+  }
+  .chips .chip-stack {
+    border-color: color-mix(in srgb, var(--blue-light) 40%, transparent);
+    color: var(--blue-light);
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: minmax(0, 2.6fr) minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: start;
+    padding: 0 var(--gutter);
+  }
+  .shot img {
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+  }
+  .shot.desktop {
+    grid-column: 1;
+  }
+  .shot.mobile {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    position: sticky;
+    top: var(--space-12);
+  }
+  .next {
+    display: grid;
+    gap: var(--space-1);
+    margin-top: var(--space-8);
+    border-top: 1px solid var(--line);
+  }
+  .next .h1 {
+    transition: color 300ms;
+  }
+  .next:hover .h1 {
+    color: var(--pink);
+  }
+  @media (max-width: 760px) {
+    .facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .row,
+    .gallery {
+      grid-template-columns: 1fr;
+    }
+    .shot.mobile {
+      grid-column: 1;
+      grid-row: auto;
+      position: static;
+      max-width: 70%;
+      margin-inline: auto;
+    }
+  }
+</style>

@@ -1,0 +1,242 @@
+---
+import { Image } from 'astro:assets';
+import ColorTitle from './ColorTitle.astro';
+import { getProjects } from '../projects';
+import { t, type Lang } from '../i18n';
+
+const { lang } = Astro.props as { lang: Lang };
+const d = t(lang);
+const base = lang === 'en' ? '/en/work/' : '/work/';
+const projects = (await getProjects()).filter((p) => p.data.featured);
+---
+
+<section id="trabalhos" class="section work" data-view="list" aria-labelledby="work-title">
+  <div class="section-head">
+    <ColorTitle as="h2" class="h1" text={d.work.title} />
+    <div class="toggle meta" role="group" aria-label={d.work.viewLabel}>
+      <button type="button" value="list" aria-pressed="true">{d.work.list}</button>
+      <button type="button" value="grid" aria-pressed="false">{d.work.grid}</button>
+    </div>
+  </div>
+
+  <div class="cols meta" aria-hidden="true">
+    <span></span><span>{d.work.cols.project}</span><span>{d.work.cols.role}</span><span>{d.work.cols.year}</span>
+  </div>
+
+  <ul class="projects">
+    {
+      projects.map((p, i) => (
+        <li>
+          <a class="proj" href={`${base}${p.id}/`} data-cursor="view">
+            <span class="proj-num meta">0{i + 1}</span>
+            <span class="proj-title h3">{p.data.title}</span>
+            <span class="proj-role meta">{p.data.role[lang]}</span>
+            <span class="proj-year meta">{p.data.year}</span>
+            <span class="proj-arrow" aria-hidden="true">↗</span>
+            <span class="proj-client meta">{p.data.client[lang]}</span>
+            <span class="proj-media">
+              <span class="proj-media-inner">
+                <span class="proj-frame">
+                <img class="cover" src={p.data.cover.src} width={p.data.cover.width} height={p.data.cover.height} alt="" loading="lazy" decoding="async" />
+                <Image class="shot" src={p.data.gallery[0].src} width={900} alt="" loading="lazy" />
+                </span>
+              </span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: var(--space-3);
+    margin-bottom: var(--space-8);
+  }
+  .toggle {
+    display: flex;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+  }
+  .toggle button {
+    font: inherit;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.4rem 0.9rem;
+    transition: background-color 200ms, color 200ms;
+  }
+  .toggle [aria-pressed='true'] {
+    background: var(--white);
+    color: var(--bg);
+  }
+
+  .projects {
+    list-style: none;
+    padding: 0;
+  }
+  .proj-media {
+    display: block;
+  }
+  .proj-media-inner {
+    display: block;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .proj-frame {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 4px;
+    background: var(--surface);
+  }
+  .proj-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .cover {
+    image-rendering: pixelated;
+  }
+  .shot {
+    opacity: 0;
+    transition: opacity 500ms var(--ease-out);
+  }
+
+  /* ── Lista ───────────────────────── */
+  .cols,
+  [data-view='list'] .proj {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 2.4fr) minmax(0, 1.4fr) 4rem 2rem;
+    align-items: baseline;
+    column-gap: var(--space-2);
+  }
+  .cols {
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--line);
+  }
+  [data-view='grid'] .cols {
+    display: none;
+  }
+  [data-view='list'] .projects li {
+    border-bottom: 1px solid var(--line);
+  }
+  [data-view='list'] .proj {
+    padding: var(--space-3) 0;
+  }
+  [data-view='list'] .proj-client {
+    display: none;
+  }
+  [data-view='list'] .proj-arrow {
+    justify-self: end;
+  }
+  /* a linha abre e mostra a capa em dither */
+  [data-view='list'] .proj-media {
+    grid-column: 2 / -1;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 600ms var(--ease-out);
+  }
+  [data-view='list'] .proj-media-inner {
+    padding-top: var(--space-3);
+  }
+  [data-view='list'] .proj-frame {
+    max-width: 640px;
+  }
+  [data-view='list'] .proj:hover .proj-media,
+  [data-view='list'] .proj:focus-visible .proj-media {
+    grid-template-rows: 1fr;
+  }
+
+  /* ── Grade ───────────────────────── */
+  [data-view='grid'] .projects {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+    gap: var(--space-8) var(--space-4);
+  }
+  [data-view='grid'] .proj {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-1) var(--space-2);
+  }
+  [data-view='grid'] .proj-media {
+    grid-row: 1;
+    grid-column: 1 / -1;
+    margin-bottom: var(--space-2);
+  }
+  [data-view='grid'] .proj-num,
+  [data-view='grid'] .proj-role,
+  [data-view='grid'] .proj-arrow {
+    display: none;
+  }
+  [data-view='grid'] .proj-client {
+    grid-column: 1;
+  }
+  [data-view='grid'] .proj-year {
+    grid-row: 2;
+    grid-column: 2;
+    align-self: center;
+  }
+  [data-view='grid'] .proj:hover .shot,
+  [data-view='grid'] .proj:focus-visible .shot {
+    opacity: 1;
+  }
+
+  @media (max-width: 760px) {
+    .cols {
+      display: none;
+    }
+    [data-view='list'] .proj {
+      grid-template-columns: 2rem 1fr auto;
+      row-gap: 0.25rem;
+    }
+    [data-view='list'] .proj-role {
+      display: none;
+    }
+    [data-view='list'] .proj-arrow {
+      display: none;
+    }
+    [data-view='list'] .proj-client {
+      display: block;
+      grid-column: 2 / -1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .proj-media,
+    .shot {
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  const section = document.querySelector<HTMLElement>('.work')!;
+  const buttons = section.querySelectorAll<HTMLButtonElement>('.toggle button');
+  const set = (view: string) => {
+    section.dataset.view = view;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.value === view)));
+  };
+  try {
+    const saved = localStorage.getItem('work-view');
+    if (saved === 'list' || saved === 'grid') set(saved);
+  } catch {}
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      set(b.value);
+      try {
+        localStorage.setItem('work-view', b.value);
+      } catch {}
+    }),
+  );
+</script>

@@ -1,0 +1,112 @@
+---
+import { Image } from 'astro:assets';
+import ColorTitle from './ColorTitle.astro';
+import photo from '../assets/otavio.jpg';
+import { t, type Lang } from '../i18n';
+
+const { lang } = Astro.props as { lang: Lang };
+const d = t(lang).about;
+---
+
+<section id="sobre" class="section about">
+  <ColorTitle as="h2" class="h1" text={d.title} />
+
+  <div class="about-grid">
+    <figure class="photo">
+      <Image src={photo} alt={d.photoAlt} widths={[360, 560, 800]} sizes="(max-width: 760px) 100vw, 34vw" />
+    </figure>
+    <div>
+      <p class="about-text" set:html={d.text} />
+      <h3 class="meta off-title">{d.offTitle}</h3>
+      <ul class="off">
+        {
+          d.off.map((o) => (
+            <li>
+              <strong>{o.name}</strong>
+              <span>{o.text}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    gap: var(--space-8);
+    align-items: start;
+    margin-top: var(--space-8);
+  }
+  .photo img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 20%;
+    border-radius: 4px;
+  }
+  .about-text {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.6vw, 2.5rem);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+  .about-text :global(mark) {
+    --hl: color-mix(in srgb, var(--blue) 45%, transparent);
+    color: inherit;
+    background: linear-gradient(var(--hl), var(--hl)) no-repeat 0 0 / 100% 100%;
+    padding: 0 0.1em;
+  }
+  .about-text :global(mark.pink) {
+    --hl: color-mix(in srgb, var(--pink) 32%, transparent);
+  }
+  /* marca-texto pinta conforme o scroll (CSS nativo); sem suporte, já vem pintado */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .about-text :global(mark) {
+        animation: paint linear both;
+        animation-timeline: view();
+        animation-range: entry 80% cover 50%;
+      }
+    }
+  }
+  @keyframes paint {
+    from {
+      background-size: 0% 100%;
+    }
+  }
+  .off-title {
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-2);
+  }
+  .off {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+  .off li {
+    display: grid;
+    align-content: start;
+    gap: 0.25rem;
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--line);
+  }
+  .off span {
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+  @media (max-width: 760px) {
+    .about-grid,
+    .off {
+      grid-template-columns: 1fr;
+    }
+    .about-grid {
+      gap: var(--space-4);
+    }
+  }
+</style>

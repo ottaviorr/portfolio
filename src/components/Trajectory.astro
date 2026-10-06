@@ -1,0 +1,190 @@
+---
+// Trajetória (ref. guillaumezhu.com): a seção fica presa na tela e, conforme o scroll,
+// cada frase entra letra a letra; no "Hoje" o fundo vira claro e dois painéis em dither
+// entram pelas laterais e se abrem até cobrir a tela.
+// Sem JS ou com reduced-motion: lista estática empilhada.
+import dither from '../assets/path-dither.png';
+import { t, type Lang } from '../i18n';
+
+const { lang } = Astro.props as { lang: Lang };
+const d = t(lang).path;
+---
+
+<section class="traj" aria-labelledby="traj-label" style={`--dither: url(${dither.src})`}>
+  <div class="traj-stage">
+    <h2 id="traj-label" class="traj-label meta">{d.label}</h2>
+    <div class="traj-flip" aria-hidden="true"></div>
+    <div class="traj-half left" aria-hidden="true"></div>
+    <div class="traj-half right" aria-hidden="true"></div>
+    <ol>
+      {
+        d.steps.map((s) => (
+          <li class="traj-step">
+            <p class="traj-when">{s.when}</p>
+            <p class="traj-what">{s.what}</p>
+            <p class="traj-note">{s.note}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  /* ── estático (fallback) ───────────── */
+  .traj-stage {
+    position: relative;
+    padding: var(--space-section) var(--gutter);
+  }
+  ol {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-12);
+    margin-top: var(--space-6);
+  }
+  .traj-when {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h3);
+    letter-spacing: -0.03em;
+    color: var(--blue-light);
+  }
+  .traj-step:nth-child(2) .traj-when {
+    color: var(--pink);
+  }
+  .traj-what {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.75rem, 9vw, 9rem);
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+    max-width: 12ch;
+    text-wrap: balance;
+  }
+  .traj-note {
+    margin-top: var(--space-3);
+    max-width: 40ch;
+    color: var(--muted);
+    font-size: var(--fs-body-lg);
+  }
+  .traj-flip,
+  .traj-half {
+    display: none;
+  }
+
+  /* ── palco (JS ativo) ──────────────── */
+  .is-staged .traj-stage {
+    height: 100svh;
+    padding: 0 var(--gutter);
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .is-staged .traj-label {
+    position: absolute;
+    top: var(--space-12);
+    left: var(--gutter);
+    z-index: 3;
+    color: color-mix(in srgb, var(--paper) 60%, transparent);
+  }
+  .is-staged ol {
+    margin: 0;
+  }
+  .is-staged .traj-step {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    text-align: center;
+    padding: 0 var(--gutter);
+    visibility: hidden; /* GSAP mostra um por vez */
+  }
+  .is-staged .traj-what {
+    margin-inline: auto;
+  }
+  .is-staged .traj-note {
+    color: color-mix(in srgb, var(--paper) 70%, transparent);
+  }
+  .is-staged .traj-step:last-child,
+  .is-staged .traj-step:last-child .traj-when,
+  .is-staged .traj-step:last-child .traj-note {
+    color: var(--ink);
+  }
+  .is-staged .traj-flip,
+  .is-staged .traj-half {
+    display: block;
+    position: absolute;
+    inset: 0;
+  }
+  .is-staged .traj-flip {
+    z-index: 0;
+    background: var(--paper);
+    clip-path: inset(100% 0 0 0);
+  }
+  .is-staged .traj-half {
+    z-index: 1;
+    /* as duas metades cobrem o palco inteiro; só o recorte muda → textura contínua */
+    background: var(--dither) center / cover no-repeat;
+    image-rendering: pixelated;
+  }
+  .is-staged .traj-half.left {
+    clip-path: inset(36% 100% 36% 0);
+  }
+  .is-staged .traj-half.right {
+    clip-path: inset(36% 0 36% 100%);
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { SplitText } from 'gsap/SplitText';
+
+  const section = document.querySelector<HTMLElement>('.traj')!;
+
+  if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    gsap.registerPlugin(ScrollTrigger, SplitText);
+    document.fonts.ready.then(() => {
+      section.classList.add('is-staged');
+      const steps = [...section.querySelectorAll<HTMLElement>('.traj-step')];
+      const [left, right] = section.querySelectorAll('.traj-half');
+
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        scrollTrigger: { trigger: section, start: 'top top', end: () => `+=${innerHeight * 5}`, pin: true, scrub: 0.6 },
+      });
+
+      steps.forEach((step, i) => {
+        const chars = SplitText.create(step.querySelectorAll('.traj-when, .traj-what'), { type: 'words,chars', aria: 'none' }).chars;
+        const note = step.querySelector('.traj-note');
+        const last = i === steps.length - 1;
+
+        if (last) {
+          // o fundo vira claro de baixo pra cima antes do "Hoje"
+          tl.to('.traj-flip', { clipPath: 'inset(0% 0 0 0)', duration: 0.6, ease: 'power2.inOut' });
+        }
+        tl.set(step, { visibility: 'visible' });
+        tl.from(chars, { yPercent: 110, rotate: 10, opacity: 0, stagger: 0.025, duration: 0.6 });
+        tl.from(note, { opacity: 0, y: 16, duration: 0.3 }, '>-0.1'); // só depois das letras assentarem
+        tl.to({}, { duration: 0.4 }); // respiro
+
+        if (!last) {
+          tl.to(chars, { yPercent: -110, opacity: 0, stagger: 0.01, duration: 0.4, ease: 'power2.in' });
+          tl.to(note, { opacity: 0, duration: 0.2 }, '<');
+          tl.set(step, { visibility: 'hidden' });
+        } else {
+          // painéis em dither entram pelas laterais e depois cobrem a tela
+          tl.to(left, { clipPath: 'inset(36% 72% 36% 0%)', duration: 0.6 }, '<-0.4');
+          tl.to(right, { clipPath: 'inset(36% 0% 36% 72%)', duration: 0.6 }, '<');
+          tl.to(note, { opacity: 0, duration: 0.2 });
+          tl.to(left, { clipPath: 'inset(0% 50% 0% 0%)', duration: 0.8, ease: 'power2.inOut' }, '<');
+          tl.to(right, { clipPath: 'inset(0% 0% 0% 50%)', duration: 0.8, ease: 'power2.inOut' }, '<');
+          tl.to({}, { duration: 0.5 });
+        }
+      });
+    });
+  }
+</script>

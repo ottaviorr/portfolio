@@ -1,0 +1,96 @@
+---
+// Título com o efeito assinatura: cada letra acende em azul/rosa ao passar o mouse
+// (ou tocar) e volta devagar pro branco. Split feito no build: zero layout shift.
+// Quebra de linha forçada: use "\n" no texto.
+interface Props {
+  text: string;
+  as?: 'h1' | 'h2' | 'h3' | 'p';
+  class?: string;
+  /** cor do ponto final, se o texto terminar em "." */
+  dot?: 'blue' | 'pink';
+}
+const { text, as: Tag = 'h2', class: cls, dot = 'pink' } = Astro.props;
+const lines = text.split('\n');
+const lastLine = lines.length - 1;
+---
+
+<Tag class:list={['ct', cls]} data-ct>
+  <span class="sr-only">{lines.join(' ')}</span>
+  <span aria-hidden="true">
+    {
+      lines.map((line, li) => (
+        <span class="ct-line">
+          {line.split(' ').map((word, wi, words) => (
+            <>
+              {wi > 0 && ' '}
+              <span class="ct-word">
+                {[...word].map((ch, ci) => {
+                  const isDot = ch === '.' && li === lastLine && wi === words.length - 1 && ci === word.length - 1;
+                  return <span class:list={['ct-char', isDot && `ct-dot ct-dot--${dot}`]}>{ch}</span>;
+                })}
+              </span>
+            </>
+          ))}
+        </span>
+      ))
+    }
+  </span>
+</Tag>
+
+<style is:global>
+  .ct-line {
+    display: block;
+  }
+  .ct-word {
+    white-space: nowrap;
+  }
+  /* inline (não inline-block) mantém o kerning entre letras */
+  .ct-char {
+    transition: color var(--dur-out) var(--ease-trail);
+  }
+  .ct-char.is-lit {
+    color: var(--lit);
+    transition-duration: var(--dur-in);
+  }
+  .ct-dot--pink {
+    color: var(--pink);
+  }
+  .ct-dot--blue {
+    color: var(--blue-light);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ct-char {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // tons claros: o efeito é um brilho, não um grito
+  const colors = ['var(--blue-light)', 'var(--pink)'];
+  const timers = new WeakMap<Element, number>();
+  let n = 0;
+
+  function light(el: Element | null) {
+    const ch = el?.closest('.ct-char') as HTMLElement | null;
+    if (!ch) return;
+    // mesma letra ainda acesa: só estende, não troca de cor (evita "piscar")
+    if (!ch.classList.contains('is-lit')) ch.style.setProperty('--lit', colors[n++ % 2]);
+    ch.classList.add('is-lit');
+    clearTimeout(timers.get(ch));
+    timers.set(ch, window.setTimeout(() => ch.classList.remove('is-lit'), 160));
+  }
+
+  for (const title of document.querySelectorAll('[data-ct]')) {
+    title.addEventListener('pointerover', (e) => light(e.target as Element));
+    // touch: pointer events ficam "presos" no alvo inicial, então seguimos o dedo à mão
+    title.addEventListener(
+      'touchmove',
+      (e) => {
+        const t = (e as TouchEvent).touches[0];
+        light(document.elementFromPoint(t.clientX, t.clientY));
+      },
+      { passive: true },
+    );
+  }
+</script>

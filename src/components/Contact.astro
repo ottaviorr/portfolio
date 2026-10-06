@@ -1,0 +1,136 @@
+---
+import ColorTitle from './ColorTitle.astro';
+import { site, isTodo } from '../site';
+import { t, type Lang } from '../i18n';
+
+const { lang } = Astro.props as { lang: Lang };
+const d = t(lang).contact;
+const run = Array(8).fill(d.marquee);
+const links = [
+  { name: 'LinkedIn', href: site.links.linkedin },
+  { name: 'GitHub', href: site.links.github },
+];
+---
+
+<section id="contato" class="contact">
+  <div class="section contact-body">
+    <ColorTitle as="h2" class="h1" text={d.title} />
+    <div class="contact-grid">
+      <p class="contact-text">{d.text}</p>
+      <div>
+        <p class="meta">{d.email}</p>
+        <a class="email" href={`mailto:${site.email}`}>{site.email}</a>
+        <ul class="links">
+          {
+            links.map((l) => (
+              <li>
+                <a href={l.href} target="_blank" rel="me noopener">
+                  {l.name} <span aria-hidden="true">↗</span>
+                  {isTodo(l.href) && <span class="todo">{l.href}</span>}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <a class="marquee" href={`mailto:${site.email}`} aria-label={`${d.marquee}: ${site.email}`}>
+    <span class="track" aria-hidden="true">
+      {[...run, ...run].map((s) => <span>{s}<i>✦</i></span>)}
+    </span>
+  </a>
+</section>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    display: block;
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.75rem, 4vw, 3.5rem);
+    letter-spacing: -0.04em;
+    color: var(--muted);
+    transition: color 300ms;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .track {
+    display: flex;
+    width: max-content;
+    animation: marquee 60s linear infinite;
+  }
+  .track i {
+    font-style: normal;
+    font-size: 0.5em;
+    vertical-align: middle;
+    color: var(--pink);
+    padding-inline: 0.6em;
+  }
+  .marquee:hover {
+    color: var(--white);
+  }
+  .marquee:hover .track {
+    animation-play-state: paused;
+  }
+  @keyframes marquee {
+    to {
+      translate: -50% 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .track {
+      animation: none;
+    }
+  }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-6);
+    margin-top: var(--space-8);
+  }
+  .contact-text {
+    font-size: var(--fs-body-lg);
+    max-width: 38ch;
+    color: var(--muted);
+  }
+  .email {
+    display: inline-block;
+    margin-top: var(--space-1);
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--blue-light);
+    border-bottom: 2px solid currentColor;
+    transition: color 200ms;
+    overflow-wrap: anywhere;
+  }
+  .email:hover {
+    color: var(--pink);
+  }
+  .links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+    font-weight: 500;
+  }
+  .links a:hover {
+    color: var(--blue-light);
+  }
+  .todo {
+    margin-left: 0.5em;
+    color: var(--pink);
+    font-size: var(--fs-meta);
+  }
+  @media (max-width: 760px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

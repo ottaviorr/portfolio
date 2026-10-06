@@ -1,0 +1,88 @@
+---
+import '../styles/global.css';
+import 'lenis/dist/lenis.css';
+import fontDisplay from '@fontsource-variable/inter-tight/files/inter-tight-latin-wght-normal.woff2?url';
+import Nav from '../components/Nav.astro';
+import Cursor from '../components/Cursor.astro';
+import Footer from '../components/Footer.astro';
+import Preloader from '../components/Preloader.astro';
+import { site, isTodo } from '../site';
+import { t, altPath, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+}
+const { lang, title, description } = Astro.props;
+const d = t(lang);
+const path = Astro.url.pathname;
+const canonical = new URL(path, Astro.site);
+const ptUrl = new URL(lang === 'pt' ? path : altPath(path, 'en'), Astro.site);
+const enUrl = new URL(lang === 'en' ? path : altPath(path, 'pt'), Astro.site);
+const pageTitle = title ?? d.meta.title;
+const pageDesc = description ?? d.meta.description;
+const ogImage = new URL(d.meta.ogImage, Astro.site);
+const isHome = path === '/' || path === '/en/';
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  alternateName: site.handle,
+  url: new URL('/', Astro.site).href,
+  jobTitle: d.hero.role,
+  address: { '@type': 'PostalAddress', addressRegion: 'Minas Gerais', addressCountry: 'BR' },
+  sameAs: Object.values(site.links).filter((l) => !isTodo(l)),
+};
+---
+
+<html lang={lang === 'pt' ? 'pt-BR' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDesc} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="pt-BR" href={ptUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={ptUrl} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href={fontDisplay} as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#070B14" />
+    <script is:inline>
+      try {
+        if (localStorage.getItem('theme') === 'light') document.documentElement.dataset.theme = 'light';
+      } catch {}
+    </script>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={lang === 'pt' ? 'pt_BR' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {isHome && <script type="application/ld+json" set:html={JSON.stringify(person)} />}
+  </head>
+  <body>
+    <Preloader />
+    <a class="skip-link" href="#main">{d.skip}</a>
+    <Nav lang={lang} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <Cursor label={d.cursorView} />
+    <script>
+      import Lenis from 'lenis';
+      if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+        new Lenis({ autoRaf: true, anchors: true });
+      }
+    </script>
+  </body>
+</html>

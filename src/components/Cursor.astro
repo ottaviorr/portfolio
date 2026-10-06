@@ -1,0 +1,132 @@
+---
+// Cursor custom: ponto exato + anel com atraso. Só em desktop com mouse e sem reduced-motion.
+// Estados: link (azul), button (rosa), view (círculo "Ver"), text (encolhe sobre títulos com efeito).
+// Força um estado em qualquer elemento com data-cursor="view|link|button|text".
+const { label } = Astro.props as { label: string };
+---
+
+<div class="cursor" aria-hidden="true" hidden>
+  <div class="cursor-ring"><span class="cursor-shape"><span class="cursor-label">{label}</span></span></div>
+  <div class="cursor-dot"></div>
+</div>
+
+<style>
+  .cursor {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  .cursor.is-visible {
+    opacity: 1;
+  }
+  .cursor-dot,
+  .cursor-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform;
+  }
+  .cursor-dot {
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    background: var(--white);
+  }
+  .cursor-shape {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    translate: -50% -50%;
+    border: 1px solid color-mix(in srgb, var(--ice) 50%, transparent);
+    border-radius: 50%;
+    transition:
+      width 400ms var(--ease-out),
+      height 400ms var(--ease-out),
+      background-color 300ms,
+      border-color 300ms;
+  }
+  .cursor-label {
+    font-size: var(--fs-meta);
+    font-weight: 600;
+    color: var(--bg);
+    opacity: 0;
+    transition: opacity 200ms;
+  }
+
+  [data-state='link'] .cursor-shape {
+    width: 56px;
+    height: 56px;
+    border-color: var(--blue-light);
+    background: color-mix(in srgb, var(--blue) 18%, transparent);
+  }
+  [data-state='button'] .cursor-shape {
+    width: 56px;
+    height: 56px;
+    border-color: var(--pink);
+    background: color-mix(in srgb, var(--pink) 18%, transparent);
+  }
+  [data-state='view'] .cursor-shape {
+    width: 96px;
+    height: 96px;
+    border-color: var(--pink);
+    background: var(--pink);
+  }
+  [data-state='view'] .cursor-label {
+    opacity: 1;
+  }
+  [data-state='view'] .cursor-dot,
+  [data-state='text'] .cursor-dot {
+    opacity: 0;
+  }
+  [data-state='text'] .cursor-shape {
+    width: 12px;
+    height: 12px;
+    border-color: var(--white);
+  }
+</style>
+
+<script>
+  const ok = matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
+  const root = document.querySelector<HTMLElement>('.cursor')!;
+
+  if (ok.matches) {
+    const dot = root.querySelector<HTMLElement>('.cursor-dot')!;
+    const ring = root.querySelector<HTMLElement>('.cursor-ring')!;
+    let x = -100, y = -100, rx = x, ry = y;
+
+    root.hidden = false;
+    document.documentElement.classList.add('has-cursor');
+
+    addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      x = e.clientX;
+      y = e.clientY;
+      dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      root.classList.add('is-visible');
+    });
+    document.addEventListener('pointerleave', () => root.classList.remove('is-visible'));
+
+    addEventListener('pointerover', (e) => {
+      const el = (e.target as Element).closest<HTMLElement>('[data-cursor], a, button, label, [data-ct]');
+      root.dataset.state = !el
+        ? ''
+        : el.dataset.cursor ?? (el.matches('[data-ct]') ? 'text' : el.matches('button, label') ? 'button' : 'link');
+    });
+
+    const tick = () => {
+      rx += (x - rx) * 0.18;
+      ry += (y - ry) * 0.18;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+      requestAnimationFrame(tick);
+    };
+    tick();
+  }
+</script>

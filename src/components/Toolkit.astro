@@ -1,0 +1,98 @@
+---
+import ColorTitle from './ColorTitle.astro';
+import { toolkit } from '../site';
+import { t, type Lang } from '../i18n';
+
+const { lang } = Astro.props as { lang: Lang };
+const d = t(lang).toolkit;
+const groups = [
+  { name: d.design, tools: toolkit.design, accent: 'var(--pink)' },
+  { name: d.code, tools: toolkit.code, accent: 'var(--blue-light)' },
+];
+---
+
+<section class="section">
+  <ColorTitle as="h2" class="h1" text={d.title} dot="blue" />
+  <div class="groups">
+    {
+      groups.map((g) => (
+        <div class="group" style={`--accent: ${g.accent}`}>
+          <h3 class="meta">{g.name}</h3>
+          <ul>
+            {g.tools.map((tool) => (
+              <li>
+                {tool.icon ? (
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d={tool.icon.path} />
+                  </svg>
+                ) : (
+                  <span class="mono" aria-hidden="true">{tool.mono}</span>
+                )}
+                {tool.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4) var(--space-8);
+    margin-top: var(--space-8);
+  }
+  .group {
+    border-top: 1px solid var(--line);
+    padding-top: var(--space-3);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: var(--space-3) var(--space-2);
+    margin-top: var(--space-3);
+  }
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    transition: color 300ms;
+  }
+  li:hover {
+    color: var(--white);
+  }
+  svg,
+  .mono {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: currentColor;
+    transition: color 300ms, fill 300ms;
+  }
+  .mono {
+    display: grid;
+    place-items: center;
+    border: 1.5px solid currentColor;
+    border-radius: 5px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  li:hover svg,
+  li:hover .mono {
+    color: var(--accent);
+    fill: var(--accent);
+  }
+  @media (max-width: 760px) {
+    .groups {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

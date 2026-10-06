@@ -1,0 +1,53 @@
+---
+import ColorTitle from './ColorTitle.astro';
+import { t, type Lang } from '../i18n';
+
+const { lang } = Astro.props as { lang: Lang };
+const d = t(lang).services;
+---
+
+<section class="section">
+  <ColorTitle as="h2" class="h1" text={d.title} dot="blue" />
+  <ol class="services">
+    {
+      d.items.map((s, i) => (
+        <li>
+          <span class="num meta" aria-hidden="true">0{i + 1}</span>
+          <h3 class="h3">{s.name}</h3>
+          <p>{s.text}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .services {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-8);
+  }
+  li {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-1) var(--space-2);
+    align-items: baseline;
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--line);
+  }
+  li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  p {
+    color: var(--muted);
+    max-width: 44ch;
+  }
+  @media (max-width: 760px) {
+    li {
+      grid-template-columns: 2rem 1fr;
+    }
+    p {
+      grid-column: 2;
+    }
+  }
+</style>
