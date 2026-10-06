@@ -144,6 +144,7 @@ const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
     if (focus) tabs[i].focus();
   };
   select(0);
+  document.querySelector('.off')?.classList.add('is-tabs');
   tabs.forEach((t, i) => {
     t.addEventListener('click', () => select(i));
     t.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && select(i));
@@ -367,6 +368,22 @@ const accents = ['var(--blue-light)', 'var(--pink)', 'var(--blue-light)'];
   }
   .off-panel[hidden] {
     display: none;
+  }
+  /* com JS (abas): os três painéis ficam empilhados na mesma célula e a tela tem sempre a altura
+     do maior. Trocar de item não muda a altura da coluna, então a foto ao lado não sobe nem desce. */
+  .off.is-tabs .off-screen {
+    display: grid;
+  }
+  .off.is-tabs .off-panel {
+    grid-area: 1 / 1;
+    align-content: start;
+  }
+  .off.is-tabs .off-panel + .off-panel {
+    margin-top: 0;
+  }
+  .off.is-tabs .off-panel[hidden] {
+    display: grid;
+    visibility: hidden; /* ocupa espaço, mas some da tela e do leitor de tela */
   }
   .sprite {
     width: 140px; /* 14 colunas × 10px: escala inteira, quadradinho nítido */
