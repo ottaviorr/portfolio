@@ -7,14 +7,22 @@ const d = t(lang).services;
 ---
 
 <section class="section">
-  <ColorTitle as="h2" class="h1" text={d.title} dot="blue" />
-  <ol class="services">
+  <div class="head">
+    <ColorTitle as="h2" class="h1" text={d.title} dot="blue" />
+    <p class="intro">{d.intro}</p>
+  </div>
+
+  <ol class="cards">
     {
       d.items.map((s, i) => (
-        <li>
-          <span class="num meta" aria-hidden="true">0{i + 1}</span>
+        <li class="card" style={`--accent: var(${i % 2 ? '--pink' : '--blue-light'})`}>
+          <span class="num" aria-hidden="true">0{i + 1}</span>
           <h3 class="h3">{s.name}</h3>
-          <p>{s.text}</p>
+          <p class="text">{s.text}</p>
+          <p class="sr-only">{d.includes}:</p>
+          <ul class="tags">
+            {s.tags.map((tag) => <li>{tag}</li>)}
+          </ul>
         </li>
       ))
     }
@@ -22,32 +30,111 @@ const d = t(lang).services;
 </section>
 
 <style>
-  .services {
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: var(--space-3);
+  }
+  .intro {
+    max-width: 28ch;
+    color: var(--muted);
+    font-size: var(--fs-body-lg);
+  }
+  .cards {
     list-style: none;
     padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
     margin-top: var(--space-8);
   }
-  li {
+  .card {
+    --mx: -999px;
+    --my: -999px;
+    position: relative;
+    isolation: isolate;
     display: grid;
-    grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--space-1) var(--space-2);
-    align-items: baseline;
-    padding: var(--space-4) 0;
-    border-top: 1px solid var(--line);
+    grid-template-rows: auto auto 1fr auto;
+    gap: var(--space-2);
+    min-height: 20rem;
+    padding: var(--space-4);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    transition: border-color 300ms;
   }
-  li:last-child {
-    border-bottom: 1px solid var(--line);
+  /* grade de pixels do hero, acendendo em volta do cursor dentro do card */
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(circle, var(--accent) 1.2px, transparent 1.7px) 0 0 / 12px 12px;
+    mask-image: radial-gradient(circle 180px at var(--mx) var(--my), #000, transparent);
+    opacity: 0;
+    transition: opacity 400ms;
   }
-  p {
+  .card:hover {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  .card:hover::before {
+    opacity: 0.5;
+  }
+  .num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(3rem, 5vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: var(--accent);
+  }
+  .card .h3 {
+    margin-top: var(--space-4);
+  }
+  .text {
+    max-width: 40ch;
     color: var(--muted);
-    max-width: 44ch;
+  }
+  .tags {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: var(--space-2);
+  }
+  .tags li {
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
   }
   @media (max-width: 760px) {
-    li {
-      grid-template-columns: 2rem 1fr;
+    .cards {
+      grid-template-columns: 1fr;
     }
-    p {
-      grid-column: 2;
+    .card {
+      min-height: 0;
+      padding: var(--space-3);
+    }
+  }
+  @media (hover: none), (prefers-reduced-motion: reduce) {
+    .card::before {
+      display: none;
     }
   }
 </style>
+
+<script>
+  for (const card of document.querySelectorAll<HTMLElement>('.card')) {
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      card.style.setProperty('--my', `${e.clientY - r.top}px`);
+    });
+  }
+</script>

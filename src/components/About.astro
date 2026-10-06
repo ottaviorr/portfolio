@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import ColorTitle from './ColorTitle.astro';
-import photo from '../assets/otavio-crop.jpg'; // recorte quadrado de otavio.jpg
+import photo from '../assets/otavio.jpg';
 import { t, type Lang } from '../i18n';
 
 const { lang } = Astro.props as { lang: Lang };
@@ -13,7 +13,7 @@ const d = t(lang).about;
 
   <div class="about-grid">
     <figure class="photo">
-      <Image src={photo} alt={d.photoAlt} widths={[320, 480, 720]} sizes="(max-width: 760px) 70vw, 320px" />
+      <Image src={photo} alt={d.photoAlt} widths={[280, 560, 840]} sizes="(max-width: 760px) 60vw, 280px" quality={85} />
     </figure>
     <div>
       <p class="about-text" set:html={d.text} />
@@ -35,16 +35,37 @@ const d = t(lang).about;
 <style>
   .about-grid {
     display: grid;
-    grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
     gap: var(--space-8);
     align-items: start;
     margin-top: var(--space-8);
   }
+  /* foto inteira em duotone azul→rosa (mesma paleta do site); no hover, a cor original volta */
+  .photo {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 6px;
+  }
   .photo img {
     width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: 4px;
+    filter: contrast(1.08);
+    transition: filter 600ms var(--ease-out);
+  }
+  .photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, var(--blue) 10%, var(--pink) 90%);
+    mix-blend-mode: color;
+    transition: opacity 600ms var(--ease-out);
+    pointer-events: none;
+  }
+  .photo:hover::after {
+    opacity: 0;
+  }
+  .photo:hover img {
+    filter: none;
   }
   .about-text {
     font-family: var(--font-display);
@@ -109,7 +130,7 @@ const d = t(lang).about;
       gap: var(--space-4);
     }
     .photo {
-      max-width: 70%;
+      max-width: 60%;
     }
   }
 </style>

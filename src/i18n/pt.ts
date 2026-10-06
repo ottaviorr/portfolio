@@ -4,7 +4,7 @@ export const pt = {
   meta: {
     title: 'Otávio Herdy — Web designer & dev',
     description:
-      'Desenho e programo sites para pequenos negócios: clínicas, construtoras e prestadores de serviço. Design, código e SEO, de Minas Gerais.',
+      'Desenho e programo sites que valorizam pequenos negócios: design, código e SEO, feitos com pesquisa e cuidado em cada detalhe.',
     ogImage: '/og-pt.png',
   },
   skip: 'Pular para o conteúdo',
@@ -53,23 +53,25 @@ export const pt = {
 
   services: {
     title: 'O que eu faço.',
+    intro: 'Do primeiro rascunho ao site no ar, com o mesmo cuidado em cada etapa.',
+    includes: 'Inclui',
     items: [
-      { name: 'Sites e landing pages', text: 'Um site que explica o que você faz em cinco segundos e abre antes do cliente desistir.' },
-      { name: 'UX/UI', text: 'Interface pensada pra quem vai usar, não pra ganhar prêmio. (Se ganhar, melhor.)' },
-      { name: 'SEO e performance', text: 'Seu cliente procura no Google. Eu faço você aparecer, e o site abrir rápido quando ele clicar.' },
-      { name: 'Automações com GoHighLevel', text: 'Formulário, agenda, WhatsApp e follow-up conversando sozinhos. Nada de copiar e colar lead.' },
+      { name: 'Sites e landing pages', text: 'Um site que explica o que você faz em cinco segundos e abre antes do cliente desistir.', tags: ['Design responsivo', 'Copy', 'Publicação'] },
+      { name: 'UX/UI', text: 'Interface pensada pra quem vai usar, não pra ganhar prêmio. (Se ganhar, melhor.)', tags: ['Pesquisa', 'Wireframes', 'Protótipo no Figma'] },
+      { name: 'SEO e performance', text: 'Seu cliente procura no Google. Eu faço você aparecer, e o site abrir rápido quando ele clicar.', tags: ['SEO técnico', 'Core Web Vitals', 'Analytics'] },
+      { name: 'Automações com GoHighLevel', text: 'Formulário, agenda, WhatsApp e follow-up conversando sozinhos. Nada de copiar e colar lead.', tags: ['Formulários', 'Agenda', 'Follow-up'] },
     ],
   },
 
   about: {
     title: 'Sobre.',
-    text: 'Sou o Otávio, de Minas Gerais, e estou no 8º período de Ciência da Computação. <mark>Faço sites para negócios que merecem um design melhor</mark>: clínicas, construtoras, empresas de limpeza, gente que instala piso e papel de parede. A ideia é simples: <mark class="pink">um site bonito, rápido e fácil de achar</mark>, que o dono manda pros clientes com orgulho.',
+    text: 'Sou o Otávio, de Minas Gerais, e estou no 8º período de Ciência da Computação. Acredito que <mark>todo negócio merece um site à altura do que entrega</mark>. Antes de desenhar, eu pesquiso: quem é o cliente, o que a concorrência faz, o que faz alguém confiar numa marca. Depois, cuido de cada detalhe para que <mark class="pink">o site valorize a empresa</mark>, abra rápido e seja fácil de achar.',
     photoAlt: 'Otávio de boné e camisa rosa, fazendo o sinal do rock com a mão',
     offTitle: 'Fora do expediente',
     off: [
-      { name: 'Rock e Taylor Swift', text: 'Fone no ouvido do café ao deploy. A pulseirinha da amizade tá no pulso.' },
+      { name: 'Rock e Taylor Swift', text: 'Fone no ouvido do primeiro commit ao deploy. A pulseirinha da amizade tá no pulso.' },
       { name: 'Videogame', text: 'Jogo com história boa e sem pressa. Life is Strange ainda mexe comigo.' },
-      { name: 'Minas Gerais', text: 'Pão de queijo é a resposta. Qual era a pergunta?' },
+      { name: 'Rosa, sempre', text: 'O boné, a camisa e, claro, este site.' },
     ],
   },
 

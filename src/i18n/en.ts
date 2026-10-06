@@ -4,7 +4,7 @@ export const en: Dict = {
   meta: {
     title: 'Otávio Herdy — Web designer & developer',
     description:
-      'I design and build websites for small businesses: clinics, builders and service companies. Design, code and SEO, from Minas Gerais, Brazil.',
+      'I design and build websites that make small businesses look their best: design, code and SEO, backed by research and care for every detail.',
     ogImage: '/og-en.png',
   },
   skip: 'Skip to content',
@@ -53,23 +53,25 @@ export const en: Dict = {
 
   services: {
     title: 'What I do.',
+    intro: 'From first sketch to live site, with the same care at every step.',
+    includes: 'Includes',
     items: [
-      { name: 'Websites & landing pages', text: 'A site that explains what you do in five seconds and loads before people give up.' },
-      { name: 'UX/UI', text: 'Interfaces made for the people using them, not for awards. (Awards are welcome, though.)' },
-      { name: 'SEO & performance', text: 'Your customers search on Google. I help you show up, and load fast when they click.' },
-      { name: 'GoHighLevel automations', text: 'Forms, calendar, WhatsApp and follow-ups talking to each other. No more copy-pasting leads.' },
+      { name: 'Websites & landing pages', text: 'A site that explains what you do in five seconds and loads before people give up.', tags: ['Responsive design', 'Copy', 'Launch'] },
+      { name: 'UX/UI', text: 'Interfaces made for the people using them, not for awards. (Awards are welcome, though.)', tags: ['Research', 'Wireframes', 'Figma prototype'] },
+      { name: 'SEO & performance', text: 'Your customers search on Google. I help you show up, and load fast when they click.', tags: ['Technical SEO', 'Core Web Vitals', 'Analytics'] },
+      { name: 'GoHighLevel automations', text: 'Forms, calendar, WhatsApp and follow-ups talking to each other. No more copy-pasting leads.', tags: ['Forms', 'Calendar', 'Follow-up'] },
     ],
   },
 
   about: {
     title: 'About.',
-    text: `I'm Otávio, from Minas Gerais, Brazil, in my 8th semester of Computer Science. <mark>I build websites for businesses that deserve better design</mark>: clinics, home builders, cleaning companies, folks who install floors and wallpaper. The idea is simple: <mark class="pink">a site that looks good, loads fast and is easy to find</mark>, one the owner is proud to send to customers.`,
+    text: `I'm Otávio, from Minas Gerais, Brazil, in my 8th semester of Computer Science. I believe <mark>every business deserves a website that lives up to its work</mark>. Before I design anything, I do the research: who the customers are, what competitors do, what makes someone trust a brand. Then I sweat the details so <mark class="pink">the site makes the business look its best</mark>, loads fast and is easy to find.`,
     photoAlt: 'Otávio in a pink cap and shirt, throwing up the rock horns',
     offTitle: 'Off the clock',
     off: [
-      { name: 'Rock & Taylor Swift', text: 'Headphones on from first coffee to last deploy. Friendship bracelets included.' },
+      { name: 'Rock & Taylor Swift', text: 'Headphones on from first commit to last deploy. Friendship bracelets included.' },
       { name: 'Video games', text: 'Story-driven, no rush. Life is Strange still gets me.' },
-      { name: 'Minas Gerais', text: 'Pão de queijo is the answer. What was the question?' },
+      { name: 'Pink, always', text: 'The cap, the shirt and, yes, this website.' },
     ],
   },
 
