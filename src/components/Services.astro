@@ -15,7 +15,7 @@ const d = t(lang).services;
   <ol class="cards">
     {
       d.items.map((s, i) => (
-        <li class="card" data-spot data-rise style={`--accent: var(${i % 2 ? '--pink' : '--blue-light'})`}>
+        <li class="card" data-spot data-rise data-tilt style={`--accent: var(${i % 2 ? '--pink' : '--blue-light'})`}>
           <span class="num" aria-hidden="true">0{i + 1}</span>
           <h3 class="h3">{s.name}</h3>
           <p class="text">{s.text}</p>
@@ -59,13 +59,27 @@ const d = t(lang).services;
     border: 1px solid var(--line);
     border-radius: 16px;
     background: var(--surface);
-    transition:
-      border-color 300ms,
-      transform 400ms var(--ease-out);
   }
   .card:hover {
     border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-    transform: translateY(-6px);
+  }
+  /* brilho que segue o cursor: dá a sensação de superfície */
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at calc((var(--px) + 0.5) * 100%) calc((var(--py) + 0.5) * 100%),
+      color-mix(in srgb, var(--white) 9%, transparent),
+      transparent 55%
+    );
+    opacity: 0;
+    transition: opacity 400ms;
+    pointer-events: none;
+  }
+  .card:hover::after {
+    opacity: 1;
   }
   .num {
     font-family: var(--font-display);
@@ -74,6 +88,9 @@ const d = t(lang).services;
     line-height: 1;
     letter-spacing: -0.05em;
     color: var(--accent);
+    /* parallax: o número corre um pouco mais que o card, como se estivesse na frente */
+    translate: calc(var(--px, 0) * 22px) calc(var(--py, 0) * 22px);
+    transition: translate 300ms var(--ease-out);
   }
   .card .h3 {
     margin-top: var(--space-4);

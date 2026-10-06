@@ -8,13 +8,15 @@ interface Props {
   class?: string;
   /** cor do ponto final, se o texto terminar em "." */
   dot?: 'blue' | 'pink';
+  /** além da cor, a letra pula e gira um pouco (só no nome do hero) */
+  play?: boolean;
 }
-const { text, as: Tag = 'h2', class: cls, dot = 'pink' } = Astro.props;
+const { text, as: Tag = 'h2', class: cls, dot = 'pink', play = false } = Astro.props;
 const lines = text.split('\n');
 const lastLine = lines.length - 1;
 ---
 
-<Tag class:list={['ct', cls]} data-ct>
+<Tag class:list={['ct', cls, play && 'ct--play']} data-ct>
   <span class="sr-only">{lines.join(' ')}</span>
   <span aria-hidden="true">
     {
@@ -58,9 +60,26 @@ const lastLine = lines.length - 1;
   .ct-dot--blue {
     color: var(--blue-light);
   }
+  /* modo play: inline-block pra poder mover a letra; sobe rápido com mola e volta devagar */
+  .ct--play .ct-char {
+    display: inline-block;
+    transition:
+      color var(--dur-out) var(--ease-trail),
+      transform 1100ms var(--ease-trail);
+  }
+  .ct--play .ct-char.is-lit {
+    transform: translateY(var(--ty)) rotate(var(--rot)) scale(1.04);
+    transition:
+      color var(--dur-in),
+      transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
   @media (prefers-reduced-motion: reduce) {
-    .ct-char {
+    .ct-char,
+    .ct--play .ct-char {
       transition: none;
+    }
+    .ct--play .ct-char.is-lit {
+      transform: none;
     }
   }
 </style>
@@ -75,7 +94,12 @@ const lastLine = lines.length - 1;
     const ch = el?.closest('.ct-char') as HTMLElement | null;
     if (!ch) return;
     // mesma letra ainda acesa: só estende, não troca de cor (evita "piscar")
-    if (!ch.classList.contains('is-lit')) ch.style.setProperty('--lit', colors[n++ % 2]);
+    if (!ch.classList.contains('is-lit')) {
+      ch.style.setProperty('--lit', colors[n++ % 2]);
+      // direção e altura aleatórias: cada passada brinca diferente
+      ch.style.setProperty('--rot', `${(Math.random() * 20 - 10).toFixed(1)}deg`);
+      ch.style.setProperty('--ty', `${(-0.05 - Math.random() * 0.1).toFixed(3)}em`);
+    }
     ch.classList.add('is-lit');
     clearTimeout(timers.get(ch));
     timers.set(ch, window.setTimeout(() => ch.classList.remove('is-lit'), 160));

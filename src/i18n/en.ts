@@ -70,11 +70,11 @@ export const en: Dict = {
     photoAlt: 'Otávio in a pink cap and shirt, throwing up the rock horns',
     badge: 'Computer Science · 8th semester · ',
     caption: 'ottaviorr, at some show',
-    offTitle: 'Off the clock',
+    offTitle: 'A bit about me',
     off: [
-      { name: 'Rock & Taylor Swift', text: 'Headphones on from first commit to last deploy. Friendship bracelets included.' },
-      { name: 'Video games', text: 'Story-driven, no rush. Life is Strange still gets me.' },
-      { name: 'Pink, always', text: 'The cap, the shirt and, yes, this website.' },
+      { name: 'Code & Design', text: 'Bringing programming logic and visual craft together to build digital experiences that are as functional as they are engaging.' },
+      { name: 'Geek & Gaming', text: 'Into interactive stories and exploring new worlds, with a place of honor always saved in my heart (and my setup) for Life is Strange.' },
+      { name: 'Big-show energy', text: 'Collecting live memories across Brazil, from the intensity of Rock in Rio to singing every word at the rail of a Taylor Swift show.' },
     ],
   },
 

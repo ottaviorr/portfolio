@@ -176,3 +176,14 @@ html.has-cursor * {
     display: none;
   }
 }
+
+/* [data-tilt]: inclinação 3D seguindo o cursor (--px/--py vêm do script em Base.astro) */
+[data-tilt] {
+  --px: 0;
+  --py: 0;
+  transform: perspective(900px) rotateX(calc(var(--py) * -10deg)) rotateY(calc(var(--px) * 12deg));
+  transition: transform 700ms var(--ease-out);
+}
+[data-tilt]:hover {
+  transition-duration: 150ms; /* segue o mouse de perto; ao sair, volta devagar */
+}

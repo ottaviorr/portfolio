@@ -1,4 +1,4 @@
-import { siFigma, siGsap, siAstro, siReact, siTypescript, siSupabase, siVercel } from 'simple-icons';
+import { siFigma, siHostinger, siAstro, siReact, siTypescript, siSupabase, siVercel } from 'simple-icons';
 
 // Dados que não mudam entre idiomas.
 export const site = {
@@ -16,7 +16,6 @@ type Tool = { name: string; icon?: { path: string }; mono?: string };
 export const toolkit: { design: Tool[]; code: Tool[] } = {
   design: [
     { name: 'Figma', icon: siFigma },
-    { name: 'GSAP', icon: siGsap },
   ],
   code: [
     { name: 'Astro', icon: siAstro },
@@ -24,6 +23,7 @@ export const toolkit: { design: Tool[]; code: Tool[] } = {
     { name: 'TypeScript', icon: siTypescript },
     { name: 'Supabase', icon: siSupabase },
     { name: 'Vercel', icon: siVercel },
+    { name: 'Hostinger', icon: siHostinger },
     { name: 'GoHighLevel', mono: 'GHL' },
   ],
 };

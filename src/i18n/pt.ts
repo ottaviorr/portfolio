@@ -70,11 +70,11 @@ export const pt = {
     photoAlt: 'Otávio de boné e camisa rosa, fazendo o sinal do rock com a mão',
     badge: 'Ciência da Computação · 8º período · ',
     caption: 'ottaviorr, em algum show',
-    offTitle: 'Fora do expediente',
+    offTitle: 'Um pouco de mim',
     off: [
-      { name: 'Rock e Taylor Swift', text: 'Fone no ouvido do primeiro commit ao deploy. A pulseirinha da amizade tá no pulso.' },
-      { name: 'Videogame', text: 'Jogo com história boa e sem pressa. Life is Strange ainda mexe comigo.' },
-      { name: 'Rosa, sempre', text: 'O boné, a camisa e, claro, este site.' },
+      { name: 'Código & Design', text: 'Unindo a lógica da programação com a estética visual para criar experiências digitais que são tão funcionais quanto envolventes.' },
+      { name: 'Imersão Geek & Gaming', text: 'Apaixonado por narrativas interativas e explorar novos universos — com um lugar de honra sempre reservado no coração (e no setup) para as histórias de Life is Strange.' },
+      { name: 'Energia de Grandes Shows', text: 'Colecionador de memórias ao vivo pelo Brasil, seja vivendo a intensidade do Rock in Rio ou cantando todas as músicas na grade de um show da Taylor Swift.' },
     ],
   },
 
