@@ -3,20 +3,45 @@
 // Nada é baixado até alguém clicar em [data-doom-open] (o controle em "Um pouco de mim"): ~4.5MB em /public/doom.
 // Desktop: janela retrô em pixel + teclado e mouse (pointer lock). Toque: vira um Game Boy.
 import { t, type Lang } from '../i18n';
+import cornerA from '../assets/corner-a.png';
+import cornerB from '../assets/corner-b.png';
 
 const { lang } = Astro.props as { lang: Lang };
 const d = t(lang).about.doom;
+
+// mini controle (o mesmo sprite do "Um pouco de mim") como ícone da barra de título
+const pad = [
+  '..####..####..',
+  '.############.',
+  '###.######.###',
+  '##...####.#.##',
+  '###.######.###',
+  '##############',
+  '####......####',
+  '.##........##.',
+];
+const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ x, y }] : [])));
 ---
 
 <dialog class="doom" aria-label={d.title}>
+  <!-- detalhes do site em volta da janela (só desktop): pixel art nos cantos + selo girando -->
+  <img class="doom-art a" src={cornerA.src} width="240" height="240" alt="" aria-hidden="true" />
+  <img class="doom-art b" src={cornerB.src} width="240" height="240" alt="" aria-hidden="true" />
+  <svg class="doom-badge" viewBox="0 0 120 120" aria-hidden="true">
+    <defs><path id="doom-badge-circle" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0" /></defs>
+    <circle cx="60" cy="60" r="58" />
+    <text><textPath href="#doom-badge-circle" textLength="286" lengthAdjust="spacing">{d.badge + d.badge}</textPath></text>
+    <rect x="52" y="52" width="16" height="16" />
+  </svg>
+
   <div class="gb">
     <div class="win-bar">
-      <span class="win-title"><span class="win-icon" aria-hidden="true"></span>ottaviorr.exe<span class="win-sub">&nbsp;— {d.title}</span></span>
-      <span class="led" aria-hidden="true"></span>
+      <span class="win-title"><svg class="win-icon" viewBox="0 0 14 8" shape-rendering="crispEdges" aria-hidden="true">{icon.map((p) => <rect x={p.x} y={p.y} width="1" height="1" />)}</svg>ottaviorr.exe<span class="win-sub">&nbsp;— {d.title}</span></span>
       <button type="button" class="win-close" data-doom-close aria-label={d.close}>✕</button>
     </div>
 
     <div class="bezel">
+      <span class="led gb-led" aria-hidden="true"></span>
       <p class="bezel-label" aria-hidden="true"><span></span>PIXEL MATRIX · NO SOUND<span></span></p>
       <div class="screen">
         <canvas width="640" height="400"></canvas>
@@ -31,7 +56,15 @@ const d = t(lang).about.doom;
     </div>
 
     <p class="brand" aria-hidden="true">ottaviorr<span>.</span> <i>GAME</i></p>
-    <p class="doom-hint meta">{d.hint}</p>
+    <!-- barra de status, estilo janela antiga -->
+    <div class="status" aria-hidden="true">
+      <span class="st-cell"><span class="led"></span><span class="st-state" data-boot={d.booting} data-run={d.running}>{d.booting}</span></span>
+      <span class="st-cell st-mouse" data-free={d.mouseFree} data-locked={d.mouseLocked}>{d.mouseFree}</span>
+      <span class="st-cell st-fps">-- FPS</span>
+    </div>
+    <ul class="keys">
+      {d.keys.map(([k, label]) => <li><kbd>{k}</kbd>{label}</li>)}
+    </ul>
 
     <!-- controle de toque (Game Boy): data-key = código de tecla do DOOM (doomkeys.h) -->
     <div class="pad" aria-hidden="true">
@@ -73,6 +106,8 @@ const d = t(lang).about.doom;
       rgb(7 11 20 / 0.9);
   }
   .gb {
+    position: relative;
+    z-index: 1; /* acima da arte dos cantos */
     background: var(--ink);
     /* borda em degraus (4px) + sombra dura rosa: cara de janela de sistema antigo */
     box-shadow:
@@ -102,10 +137,9 @@ const d = t(lang).about.doom;
     gap: 10px;
   }
   .win-icon {
-    width: 12px;
-    height: 12px;
-    background: var(--pink);
-    box-shadow: 4px 4px 0 0 var(--paper) inset;
+    width: 28px;
+    height: 16px;
+    fill: var(--pink);
   }
   .win-close {
     display: grid;
@@ -240,7 +274,7 @@ const d = t(lang).about.doom;
 
   /* LED de energia: pisca carregando, acende rodando */
   .led {
-    margin-left: auto;
+    flex: none;
     width: 10px;
     height: 10px;
     background: #4a1f2e;
@@ -265,11 +299,141 @@ const d = t(lang).about.doom;
   .brand {
     display: none;
   }
-  .doom-hint {
-    padding: 0 12px 12px;
-    color: color-mix(in srgb, var(--paper) 65%, transparent);
+  /* barra de status: três células afundadas, como em janela de sistema antigo */
+  .status {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 4px;
+    padding: 0 12px;
+    font-family: var(--font-display);
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ice);
   }
-  .pad {
+  .st-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 26px;
+    padding: 0 10px;
+    background: var(--surface);
+    box-shadow:
+      inset 2px 2px 0 0 rgb(0 0 0 / 0.45),
+      inset -2px -2px 0 0 rgb(255 255 255 / 0.06);
+  }
+  .st-mouse {
+    color: var(--blue-light);
+  }
+  .doom.is-locked .st-mouse {
+    color: var(--pink);
+  }
+  .st-fps {
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+  /* controles como teclas desenhadas */
+  .keys {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    padding: 10px 12px 14px;
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--paper) 70%, transparent);
+  }
+  .keys li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .keys kbd {
+    padding: 2px 7px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 0.6875rem;
+    font-weight: 800;
+    box-shadow:
+      inset -2px -2px 0 0 rgb(0 0 0 / 0.25),
+      0 2px 0 0 var(--blue-light);
+  }
+
+  /* pixel art do site espiando pelos cantos da janela + selo rosa girando */
+  .doom-art {
+    position: absolute;
+    z-index: 0;
+    width: 480px; /* 240px × 2: escala inteira, bloco nítido */
+    height: 480px;
+    max-width: none;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+  .doom-art.a {
+    top: -230px;
+    left: -250px;
+  }
+  .doom-art.b {
+    right: -240px;
+    bottom: -250px;
+    rotate: 180deg;
+  }
+  .doom-badge {
+    position: absolute;
+    z-index: 2;
+    bottom: -70px; /* canto inferior esquerdo, pra fora: longe do ✕ e das teclas */
+    left: -96px;
+    width: 100px;
+    height: 100px;
+    animation: doom-spin 16s linear infinite;
+  }
+  .doom-badge circle {
+    fill: var(--pink);
+  }
+  .doom-badge text {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    fill: var(--ink);
+  }
+  .doom-badge rect {
+    fill: var(--ink);
+  }
+  @keyframes doom-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .doom-badge {
+    transform-origin: center;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .doom-badge {
+      animation: none;
+    }
+  }
+
+  /* o site esconde o cursor do sistema e desenha o próprio, mas o <dialog> fica na camada de cima
+     (top layer) e o cursor custom ficava por trás: dentro do jogo volta o cursor normal */
+  html.has-cursor .doom,
+  html.has-cursor .doom * {
+    cursor: auto !important;
+  }
+  html.has-cursor .doom button,
+  html.has-cursor .doom button * {
+    cursor: pointer !important;
+  }
+  html.has-cursor .doom .screen,
+  html.has-cursor .doom .screen * {
+    cursor: crosshair !important;
+  }
+  html:has(dialog.doom[open]) .cursor {
+    display: none;
+  }
+  .pad,
+  .gb-led {
     display: none;
   }
   @keyframes doom-blink {
@@ -317,11 +481,12 @@ const d = t(lang).about.doom;
       font-size: 0.6875rem;
     }
     .win-icon,
-    .win-sub {
+    .win-sub,
+    .doom-art,
+    .doom-badge,
+    .status,
+    .keys {
       display: none;
-    }
-    .led {
-      margin-right: 8px;
     }
     .win-close {
       width: 32px;
@@ -332,9 +497,20 @@ const d = t(lang).about.doom;
       box-shadow: none;
     }
     .bezel {
+      position: relative;
       padding: 10px 22px 22px;
       background: #3d4256;
       border-radius: 10px 10px 40px 10px;
+    }
+    /* LED de energia à esquerda da tela, como no Game Boy */
+    .gb-led {
+      display: block;
+      position: absolute;
+      left: 7px;
+      top: 45%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
     }
     .bezel-label {
       display: flex;
@@ -356,9 +532,6 @@ const d = t(lang).about.doom;
     .screen {
       border-radius: 2px;
       box-shadow: 0 0 0 3px #22252f;
-    }
-    .doom-hint {
-      display: none;
     }
     .brand {
       display: block;
@@ -631,6 +804,13 @@ const d = t(lang).about.doom;
     if (want) turnBudget -= Math.sign(turnBudget) * Math.min(Math.abs(turnBudget), PX_PER_FRAME);
   }
   const locked = () => document.pointerLockElement === canvas;
+  const stMouse = dialog.querySelector<HTMLElement>('.st-mouse')!;
+  const stState = dialog.querySelector<HTMLElement>('.st-state')!;
+  const stFps = dialog.querySelector<HTMLElement>('.st-fps')!;
+  document.addEventListener('pointerlockchange', () => {
+    dialog.classList.toggle('is-locked', locked());
+    stMouse.textContent = locked() ? stMouse.dataset.locked! : stMouse.dataset.free!;
+  });
   canvas.addEventListener('click', () => {
     if (!locked() && matchMedia('(pointer: fine)').matches) canvas.requestPointerLock();
   });
@@ -661,6 +841,8 @@ const d = t(lang).about.doom;
   // ── loop ───────────────────────────────────────────────────────
   const image = ctx.createImageData(W, H);
   const out = new Uint32Array(image.data.buffer);
+  let frames = 0;
+  let fpsT = performance.now();
   function frame() {
     if (!running || !doom) return;
     mouseTurn();
@@ -672,6 +854,14 @@ const d = t(lang).about.doom;
       out[i] = 0xff000000 | ((p & 0xff) << 16) | (p & 0xff00) | ((p >> 16) & 0xff);
     }
     ctx.putImageData(image, 0, 0);
+    // FPS na barra de status (atualiza 2x por segundo)
+    frames++;
+    const now = performance.now();
+    if (now - fpsT >= 500) {
+      stFps.textContent = `${Math.round((frames * 1000) / (now - fpsT))} FPS`;
+      frames = 0;
+      fpsT = now;
+    }
     requestAnimationFrame(frame);
   }
 
@@ -681,7 +871,10 @@ const d = t(lang).about.doom;
     dialog.showModal();
     if (!booting) {
       // 1ª vez: o boot fica na tela pelo menos o tempo do logo descer
-      booting = Promise.all([boot(), wait(1400)]).then(() => dialog.classList.add('is-ready'));
+      booting = Promise.all([boot(), wait(1400)]).then(() => {
+        dialog.classList.add('is-ready');
+        stState.textContent = stState.dataset.run!;
+      });
     }
     try {
       await booting;
