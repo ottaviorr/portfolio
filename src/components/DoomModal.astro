@@ -57,14 +57,45 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
 
     <p class="brand" aria-hidden="true">ottaviorr<span>.</span> <i>GAME</i></p>
     <!-- barra de status, estilo janela antiga -->
+    <!-- status em uma linha só, com pontilhado ligando as partes (cara de terminal, não de caixas) -->
     <div class="status" aria-hidden="true">
-      <span class="st-cell"><span class="led"></span><span class="st-state" data-boot={d.booting} data-run={d.running}>{d.booting}</span></span>
-      <span class="st-cell st-mouse" data-free={d.mouseFree} data-locked={d.mouseLocked}>{d.mouseFree}</span>
-      <span class="st-cell st-fps">-- FPS</span>
+      <span class="led"></span>
+      <span class="st-state" data-boot={d.booting} data-run={d.running}>{d.booting}</span>
+      <span class="st-dots"></span>
+      <span class="st-mouse" data-free={d.mouseFree} data-locked={d.mouseLocked}>{d.mouseFree}</span>
+      <span class="st-dots"></span>
+      <span class="st-fps">-- FPS</span>
     </div>
-    <ul class="keys">
-      {d.keys.map(([k, label]) => <li><kbd>{k}</kbd>{label}</li>)}
+
+    <!-- controles como página de manual: WASD no formato real, mouse desenhado e o resto em índice -->
+    <ul class="sr-only">
+      {d.keys.map(([k, label]) => <li>{k}: {label}</li>)}
     </ul>
+    <div class="manual" aria-hidden="true">
+      <figure class="m-wasd">
+        <div class="wasd">
+          <kbd class="w">W</kbd>
+          <kbd>A</kbd>
+          <kbd>S</kbd>
+          <kbd>D</kbd>
+        </div>
+        <figcaption>{d.keys[0][1]}</figcaption>
+      </figure>
+      <figure class="m-mouse">
+        <div class="mouse"><i class="l"></i><i class="r"></i></div>
+        <figcaption><span class="l">◀ {d.keys[1][1]}</span><span class="r">{d.keys[2][1]} ▶</span></figcaption>
+      </figure>
+      <dl class="m-rest">
+        {
+          d.keys.slice(3).map(([k, label]) => (
+            <div>
+              <dt><kbd>{k}</kbd></dt>
+              <dd>{label}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
 
     <!-- controle de toque (Game Boy): data-key = código de tecla do DOOM (doomkeys.h) -->
     <div class="pad" aria-hidden="true">
@@ -299,29 +330,29 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
   .brand {
     display: none;
   }
-  /* barra de status: três células afundadas, como em janela de sistema antigo */
+  /* status: uma linha, pontilhado entre as partes */
   .status {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 4px;
-    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 12px 0;
     font-family: var(--font-display);
     font-size: 0.6875rem;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--ice);
+    color: color-mix(in srgb, var(--paper) 55%, transparent);
+    white-space: nowrap;
   }
-  .st-cell {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 26px;
-    padding: 0 10px;
-    background: var(--surface);
-    box-shadow:
-      inset 2px 2px 0 0 rgb(0 0 0 / 0.45),
-      inset -2px -2px 0 0 rgb(255 255 255 / 0.06);
+  .st-state {
+    color: var(--paper);
+  }
+  .st-dots {
+    flex: 1;
+    min-width: 12px;
+    height: 2px;
+    background: radial-gradient(circle, currentColor 1px, transparent 1.2px) 0 0 / 6px 2px;
+    opacity: 0.5;
   }
   .st-mouse {
     color: var(--blue-light);
@@ -331,33 +362,114 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
   }
   .st-fps {
     font-variant-numeric: tabular-nums;
-    color: var(--muted);
   }
-  /* controles como teclas desenhadas */
-  .keys {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 14px;
-    padding: 10px 12px 14px;
-    font-size: 0.75rem;
-    color: color-mix(in srgb, var(--paper) 70%, transparent);
-  }
-  .keys li {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .keys kbd {
-    padding: 2px 7px;
-    background: var(--paper);
-    color: var(--ink);
+
+  /* manual: tecla com relevo de verdade (lado de baixo mais escuro), não chip */
+  .manual kbd {
+    display: inline-grid;
+    place-items: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 6px;
+    background: var(--surface);
+    color: var(--paper);
+    border: 1px solid color-mix(in srgb, var(--ice) 22%, transparent);
+    border-bottom-width: 4px;
+    border-radius: 4px;
     font-family: var(--font-display);
     font-size: 0.6875rem;
     font-weight: 800;
-    box-shadow:
-      inset -2px -2px 0 0 rgb(0 0 0 / 0.25),
-      0 2px 0 0 var(--blue-light);
+  }
+  .manual {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: 28px;
+    margin: 12px 12px 14px;
+    padding-top: 14px;
+    border-top: 2px dashed color-mix(in srgb, var(--ice) 14%, transparent);
+  }
+  .manual figure {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .manual figcaption {
+    display: grid;
+    gap: 2px;
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--paper) 70%, transparent);
+  }
+  .wasd {
+    display: grid;
+    grid-template-columns: repeat(3, 26px);
+    gap: 3px;
+  }
+  .wasd kbd {
+    min-width: 0;
+    padding: 0;
+  }
+  .wasd kbd:not(.w) {
+    grid-row: 2; /* A S D embaixo, W em cima: T invertido */
+  }
+  .wasd .w {
+    grid-column: 2;
+    border-color: var(--blue-light);
+    color: var(--blue-light);
+  }
+  /* mouse desenhado: botão esquerdo rosa (atirar), direito azul (abrir portas) */
+  .mouse {
+    position: relative;
+    width: 34px;
+    height: 50px;
+    border: 2px solid color-mix(in srgb, var(--ice) 45%, transparent);
+    border-radius: 17px 17px 14px 14px;
+    overflow: hidden;
+  }
+  .mouse i {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 44%;
+  }
+  .mouse .l {
+    left: 0;
+    background: var(--pink);
+    border-right: 2px solid var(--ink);
+  }
+  .mouse .r {
+    right: 0;
+    background: var(--blue-light);
+  }
+  .manual figcaption .l {
+    color: var(--pink);
+  }
+  .manual figcaption .r {
+    color: var(--blue-light);
+  }
+  /* o resto em índice de manual: tecla, pontilhado, ação */
+  .m-rest {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 22px;
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--paper) 70%, transparent);
+  }
+  .m-rest div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .m-rest div::after {
+    content: '';
+    order: 1;
+    flex: 1;
+    height: 2px;
+    background: radial-gradient(circle, currentColor 1px, transparent 1.2px) 0 0 / 6px 2px;
+    opacity: 0.4;
+  }
+  .m-rest dd {
+    order: 2;
   }
 
   /* pixel art do site espiando pelos cantos da janela + selo rosa girando */
@@ -485,7 +597,7 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
     .doom-art,
     .doom-badge,
     .status,
-    .keys {
+    .manual {
       display: none;
     }
     .win-close {
