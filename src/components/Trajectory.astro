@@ -78,15 +78,15 @@ const d = t(lang).path;
     height: 100svh;
     padding: 0 var(--gutter);
     overflow: hidden;
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--bg); /* segue o tema; só o "Hoje" vira papel + dither */
+    color: var(--white);
   }
   .is-staged .traj-label {
     position: absolute;
     top: var(--space-12);
     left: var(--gutter);
     z-index: 3;
-    color: color-mix(in srgb, var(--paper) 60%, transparent);
+    color: var(--muted);
   }
   .is-staged ol {
     margin: 0;
@@ -106,7 +106,7 @@ const d = t(lang).path;
     margin-inline: auto;
   }
   .is-staged .traj-note {
-    color: color-mix(in srgb, var(--paper) 70%, transparent);
+    color: var(--muted);
   }
   .is-staged .traj-step:last-child,
   .is-staged .traj-step:last-child .traj-when,
@@ -157,6 +157,12 @@ const d = t(lang).path;
         scrollTrigger: { trigger: section, start: 'top top', end: () => `+=${innerHeight * 5}`, pin: true, scrub: 0.6 },
       });
 
+      // o 1º passo já se monta enquanto a seção entra na tela (sem tela vazia)
+      const intro = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        scrollTrigger: { trigger: section, start: 'top 75%', end: 'top 5%', scrub: 0.6 },
+      });
+
       steps.forEach((step, i) => {
         const chars = SplitText.create(step.querySelectorAll('.traj-when, .traj-what'), { type: 'words,chars', aria: 'none' }).chars;
         const note = step.querySelector('.traj-note');
@@ -166,9 +172,10 @@ const d = t(lang).path;
           // o fundo vira claro de baixo pra cima antes do "Hoje"
           tl.to('.traj-flip', { clipPath: 'inset(0% 0 0 0)', duration: 0.6, ease: 'power2.inOut' });
         }
-        tl.set(step, { visibility: 'visible' });
-        tl.from(chars, { yPercent: 110, rotate: 10, opacity: 0, stagger: 0.025, duration: 0.6 });
-        tl.from(note, { opacity: 0, y: 16, duration: 0.3 }, '>-0.1'); // só depois das letras assentarem
+        const enter = i === 0 ? intro : tl;
+        enter.set(step, { visibility: 'visible' });
+        enter.from(chars, { yPercent: 110, rotate: 10, opacity: 0, stagger: 0.025, duration: 0.6 });
+        enter.from(note, { opacity: 0, y: 16, duration: 0.3 }, '>-0.1'); // só depois das letras assentarem
         tl.to({}, { duration: 0.4 }); // respiro
 
         if (!last) {
