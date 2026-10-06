@@ -37,6 +37,7 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
   <div class="gb">
     <div class="win-bar">
       <span class="win-title"><svg class="win-icon" viewBox="0 0 14 8" shape-rendering="crispEdges" aria-hidden="true">{icon.map((p) => <rect x={p.x} y={p.y} width="1" height="1" />)}</svg>ottaviorr.exe<span class="win-sub">&nbsp;— {d.title}</span></span>
+      <span class="led win-led" aria-hidden="true"></span>
       <button type="button" class="win-close" data-doom-close aria-label={d.close}>✕</button>
     </div>
 
@@ -58,8 +59,6 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
     <p class="brand" aria-hidden="true">ottaviorr<span>.</span> <i>GAME</i></p>
     <!-- status: uma linha limpa, no padrão do site (rótulo pequeno, sem enfeite) -->
     <div class="status" aria-hidden="true">
-      <span class="led"></span>
-      <span class="st-state" data-boot={d.booting} data-run={d.running}>{d.booting}</span>
       <span class="st-mouse" data-free={d.mouseFree} data-locked={d.mouseLocked}>{d.mouseFree}</span>
       <span class="st-fps">-- FPS</span>
     </div>
@@ -151,6 +150,9 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
     width: 28px;
     height: 16px;
     fill: var(--pink);
+  }
+  .win-led {
+    margin-left: auto; /* LED de "ligado" ao lado do fechar */
   }
   .win-close {
     display: grid;
@@ -326,16 +328,10 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
     color: var(--w-muted);
     white-space: nowrap;
   }
-  .st-state {
-    color: var(--paper);
-    font-weight: 600;
-  }
   .st-mouse {
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-left: 12px;
-    border-left: 1px solid var(--w-line);
     color: var(--blue-light);
   }
   .doom.is-locked .st-mouse {
@@ -348,7 +344,8 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
   .ctrl {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    margin: 14px 12px 16px;
+    margin: 10px 12px 0;
+    padding-bottom: 22px; /* respiro embaixo: o bloco não fica colado na borda da janela */
     border-top: 1px solid var(--w-line);
   }
   .ctrl div {
@@ -519,6 +516,7 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
       font-size: 0.6875rem;
     }
     .win-icon,
+    .win-led,
     .win-sub,
     .doom-art,
     .doom-badge,
@@ -843,7 +841,6 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
   }
   const locked = () => document.pointerLockElement === canvas;
   const stMouse = dialog.querySelector<HTMLElement>('.st-mouse')!;
-  const stState = dialog.querySelector<HTMLElement>('.st-state')!;
   const stFps = dialog.querySelector<HTMLElement>('.st-fps')!;
   document.addEventListener('pointerlockchange', () => {
     dialog.classList.toggle('is-locked', locked());
@@ -911,7 +908,6 @@ const icon = pad.flatMap((row, y) => [...row].flatMap((c, x) => (c === '#' ? [{ 
       // 1ª vez: o boot fica na tela pelo menos o tempo do logo descer
       booting = Promise.all([boot(), wait(1400)]).then(() => {
         dialog.classList.add('is-ready');
-        stState.textContent = stState.dataset.run!;
       });
     }
     try {
