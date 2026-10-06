@@ -34,23 +34,28 @@ const letters = [...'Otávio Herdy'];
     animation: pre-out 1100ms cubic-bezier(0.65, 0, 0.35, 1) 2400ms forwards;
   }
   .preloader p {
+    animation: pre-rise 1600ms cubic-bezier(0.16, 1, 0.3, 1) both;
     font-family: var(--font-display);
     font-weight: 800;
     font-size: clamp(2.5rem, 9vw, 7rem);
     letter-spacing: -0.05em;
   }
-  /* inline + top relativo (não inline-block) pra manter o kerning entre as letras */
+  /* letra inline (kerning intacto) e sem mexer posição: 'top' anda de pixel em pixel e
+     dava degraus. Cada letra só desfoca/aparece; quem se move é a linha inteira (transform). */
   .preloader span {
-    position: relative;
     animation:
-      pre-in 1100ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i) * 60ms) both,
+      pre-in 1300ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i) * 55ms) both,
       pre-blink 1700ms ease-in-out calc(var(--i) * 60ms) both;
   }
   @keyframes pre-in {
     from {
       opacity: 0;
-      top: 0.35em;
-      filter: blur(10px); /* entra desfocada e vai ganhando nitidez */
+      filter: blur(12px); /* entra desfocada e vai ganhando nitidez */
+    }
+  }
+  @keyframes pre-rise {
+    from {
+      transform: translateY(0.35em);
     }
   }
   @keyframes pre-blink {

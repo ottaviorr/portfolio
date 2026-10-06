@@ -7,6 +7,7 @@ const { lang } = Astro.props as { lang: Lang };
 const d = t(lang).toolkit;
 const tools = [
   ...toolkit.design.map((tool) => ({ ...tool, group: d.design, accent: 'var(--pink)' })),
+  ...toolkit.ai.map((tool) => ({ ...tool, group: d.ai, accent: 'var(--pink)' })),
   ...toolkit.code.map((tool) => ({ ...tool, group: d.code, accent: 'var(--blue-light)' })),
 ];
 ---
@@ -75,10 +76,6 @@ const tools = [
   }
   .tile:hover svg {
     fill: var(--accent);
-  }
-  /* 7 ferramentas: a primeira (design) ocupa 2 colunas e a grade fecha em 4×2 */
-  .tile:first-child {
-    grid-column: span 2;
   }
   .name {
     font-family: var(--font-display);

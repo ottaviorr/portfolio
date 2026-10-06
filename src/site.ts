@@ -1,4 +1,4 @@
-import { siFigma, siHostinger, siAstro, siReact, siTypescript, siSupabase, siVercel } from 'simple-icons';
+import { siFigma, siClaudecode, siHostinger, siAstro, siReact, siTypescript, siSupabase, siVercel } from 'simple-icons';
 
 // Dados que não mudam entre idiomas.
 export const site = {
@@ -11,12 +11,13 @@ export const site = {
   },
 };
 
-// Toolkit: ícones do simple-icons. O 1º item de design ocupa 2 colunas (grade fecha em 4×2).
+// Toolkit: ícones do simple-icons. Total de 8 → a grade fecha em 4×2.
 type Tool = { name: string; icon: { path: string } };
-export const toolkit: { design: Tool[]; code: Tool[] } = {
+export const toolkit: { design: Tool[]; ai: Tool[]; code: Tool[] } = {
   design: [
     { name: 'Figma', icon: siFigma },
   ],
+  ai: [{ name: 'Claude Code', icon: siClaudecode }],
   code: [
     { name: 'Astro', icon: siAstro },
     { name: 'React', icon: siReact },

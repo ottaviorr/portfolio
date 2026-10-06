@@ -9,6 +9,7 @@ const d = t(lang).hero;
 
 <section class="hero">
   <div class="pixels" aria-hidden="true"></div>
+  <div class="orb" aria-hidden="true"></div>
 
   <div class="hero-name">
     <ColorTitle as="h1" class="display" text={'Otávio\nHerdy.'} play />
@@ -28,13 +29,14 @@ const d = t(lang).hero;
 <style>
   .hero {
     position: relative;
+    overflow: clip; /* a esfera vaza pela direita no celular; não pode alargar a página */
     min-height: 100svh;
     display: grid;
     grid-template-rows: 1fr auto;
     gap: var(--space-6);
     padding: var(--space-12) var(--gutter) var(--space-4);
   }
-  .hero > :not(.pixels) {
+  .hero > :not(.pixels, .orb) {
     position: relative;
     z-index: 1;
   }
@@ -70,6 +72,60 @@ const d = t(lang).hero;
   @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
     .pixels {
       display: none;
+    }
+  }
+  /* esfera em meio-tom: o degradê gira por trás de uma grade de pontos PARADA
+     (pontos fixos não cintilam; só a cor flui). Ocupa o vazio à direita do nome. */
+  @property --orb-a {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+  .orb {
+    position: absolute;
+    top: 50%;
+    right: var(--gutter);
+    z-index: 0;
+    width: min(38vw, 560px);
+    aspect-ratio: 1;
+    translate: 0 -58%;
+    pointer-events: none;
+    background: conic-gradient(
+      from var(--orb-a),
+      var(--blue),
+      var(--pink),
+      var(--blue-light),
+      var(--pink-light),
+      var(--blue)
+    );
+    -webkit-mask:
+      radial-gradient(circle, #000 2.3px, transparent 2.8px) 0 0 / 10px 10px,
+      radial-gradient(closest-side, #000 55%, transparent);
+    -webkit-mask-composite: source-in;
+    mask:
+      radial-gradient(circle, #000 2.3px, transparent 2.8px) 0 0 / 10px 10px,
+      radial-gradient(closest-side, #000 55%, transparent);
+    mask-composite: intersect;
+    opacity: 0.95;
+    animation: orb-spin 30s linear infinite;
+  }
+  @keyframes orb-spin {
+    to {
+      --orb-a: 360deg;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .orb {
+      animation: none;
+    }
+  }
+  @media (max-width: 640px) {
+    .orb {
+      top: 8%;
+      right: -12%;
+      width: 80vw;
+      translate: none;
+      opacity: 0.55;
     }
   }
   .hero-name {
