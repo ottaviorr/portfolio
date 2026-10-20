@@ -17,6 +17,8 @@ export const pt = {
     tagline: 'Faço sites que dão a pequenos negócios um design à altura do trabalho que eles fazem.',
     location: 'Minas Gerais, Brasil',
     cta: 'Bora conversar',
+    available: 'Disponível para novos projetos',
+    scroll: 'Role',
   },
 
   path: {
@@ -114,8 +116,6 @@ export const pt = {
     text: 'Me conta o que você precisa: o negócio, o prazo, o que te incomoda no site atual. Eu leio tudo e respondo.',
     email: 'Mande um e-mail',
   },
-
-  footer: { line: 'Feito em Minas, com rock no fone.' },
 };
 
 export type Dict = typeof pt;

@@ -6,12 +6,12 @@ import type { ImageMetadata } from 'astro';
 
 interface Props {
   src: ImageMetadata;
-  corner: 'bottom-left' | 'bottom-right';
+  corner: 'bottom-left' | 'bottom-right' | 'top-right';
 }
 const { src, corner } = Astro.props;
 ---
 
-<img class:list={['px-corner', corner]} src={src.src} width={src.width} height={src.height} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+<img class:list={['px-corner', corner, 'is-off']} src={src.src} width={src.width} height={src.height} alt="" aria-hidden="true" decoding="async" />
 
 <style is:global>
   .has-corner {
@@ -38,15 +38,39 @@ const { src, corner } = Astro.props;
   .px-corner.bottom-left {
     left: -280px;
   }
-  /* Contato: o miolo rosa fica no canto inferior direito; some pra baixo (antes da faixa
-     "Bora conversar") e em círculo na direção do e-mail */
-  .px-corner.bottom-right {
-    right: -300px;
-    bottom: -350px;
-    mask-image:
-      linear-gradient(to bottom, #000 56%, transparent 66%),
-      radial-gradient(circle at 62% 58%, #000 22%, transparent 38%);
-    mask-composite: intersect;
+  /* desce do canto superior direito e some antes da borda de cima da seção */
+  .px-corner.top-right {
+    top: -540px;
+    right: -320px;
+    mask-image: linear-gradient(to top, #000 26%, transparent 44%);
+  }
+  /* entra "acendendo" em degraus (steps = cara de pixel) quando a seção chega na tela,
+     e depois fica derivando devagar, como uma nuvem */
+  @keyframes px-in {
+    from {
+      opacity: 0;
+      scale: 0.82;
+    }
+  }
+  @keyframes px-drift {
+    to {
+      translate: 18px -14px;
+      rotate: 2deg;
+    }
+  }
+  /* começa apagada; o script acende em degraus quando entra na tela */
+  .px-corner.is-off {
+    opacity: 0;
+    scale: 0.82;
+  }
+  .px-corner.is-on {
+    animation:
+      px-in 900ms steps(7, end) both,
+      px-drift 11s ease-in-out 900ms infinite alternate;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .px-corner.is-off { opacity: 1; scale: 1; }
+    .px-corner.is-on { animation: none; }
   }
   @media (max-width: 760px) {
     .px-corner {
@@ -61,9 +85,24 @@ const { src, corner } = Astro.props;
     .px-corner.bottom-left {
       left: -160px;
     }
+    .px-corner.top-right {
+      top: -270px;
+      right: -175px;
+    }
     .px-corner.bottom-right {
       right: -175px;
       bottom: -195px;
     }
   }
 </style>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      e.target.classList.replace('is-off', 'is-on');
+      io.unobserve(e.target);
+    }
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.px-corner').forEach((el) => io.observe(el));
+</script>
