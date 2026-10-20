@@ -1,15 +1,12 @@
 ---
 import ColorTitle from './ColorTitle.astro';
-import PixelCorner from './PixelCorner.astro';
-import cornerB from '../assets/corner-b.png';
 import { t, type Lang } from '../i18n';
 
 const { lang } = Astro.props as { lang: Lang };
 const d = t(lang).services;
 ---
 
-<section class="section has-corner">
-  <PixelCorner src={cornerB} corner="top-right" />
+<section class="section">
   <div class="head">
     <ColorTitle as="h2" class="h1" text={d.title} dot="blue" />
     <p class="intro">{d.intro}</p>

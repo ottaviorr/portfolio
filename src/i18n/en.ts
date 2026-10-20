@@ -17,8 +17,6 @@ export const en: Dict = {
     tagline: 'I build websites that give small businesses a design as good as the work they do.',
     location: 'Minas Gerais, Brazil',
     cta: "Let's talk",
-    available: 'Available for new projects',
-    scroll: 'Scroll',
   },
 
   path: {
@@ -116,4 +114,6 @@ export const en: Dict = {
     text: "Tell me what you need: the business, the deadline, what bugs you about your current site. I read everything and I'll get back to you.",
     email: 'Send an email',
   },
+
+  footer: { line: 'Made in Minas Gerais, with rock in my headphones.' },
 };
